@@ -16,6 +16,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -106,9 +107,10 @@ public class BonusesView extends JPanel {
             Percentage p = DatabaseConnection.getPercentageDao().getPercentageById(bonus.getPercentageId());
             tableModel.addRow(new Object[]{bonus.getId(), bonus.getSaleId(), bonus.getUserId(),
                 user.getName() + " " + user.getLastName(),
-                p.getId(), p.getPercentage(),
-                ApplicationStarter.formatDate(new Date(bonus.getDate())), bonus.getBonus()});
-            totalBonuses.setText(bonus.getBonus()+ "");
+                p.getId(), ApplicationStarter.PERCENTAGE_FORMAT.format(p.getPercentage()),
+                ApplicationStarter.formatDate(new Date(bonus.getDate())), 
+                ApplicationStarter.CURRENCY_FORMAT.format(bonus.getBonus())});
+            totalBonuses.setText(ApplicationStarter.CURRENCY_FORMAT.format(bonus.getBonus()));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontro la bonificación especificada.");
             totalBonuses.setText("");
@@ -131,7 +133,7 @@ public class BonusesView extends JPanel {
 
         Double totalBonusesSum = 0d;
         ArrayList<Bonus> bonuses = DatabaseConnection.getBonusDao().getBonusesInDateRange(date1, date2);
-        Object[][] data = new Object[bonuses.size()][7];
+        Object[][] data = new Object[bonuses.size()][8];
         if (bonuses != null && !bonuses.isEmpty()) {
             for (int i = 0; i < bonuses.size(); i++) {
                 User user = DatabaseConnection.getUserDao().getUserById(bonuses.get(i).getUserId());
@@ -142,15 +144,15 @@ public class BonusesView extends JPanel {
                 data[i][2] = user.getId();
                 data[i][3] = user.getName()+" "+user.getLastName();
                 data[i][4] = p.getId();
-                data[i][5] = p.getPercentage();
+                data[i][5] = ApplicationStarter.PERCENTAGE_FORMAT.format(p.getPercentage());
                 data[i][6] = ApplicationStarter.formatDate(new Date(bonuses.get(i).getDate()));
-                data[i][7] = bonuses.get(i).getBonus();
+                data[i][7] = ApplicationStarter.CURRENCY_FORMAT.format(bonuses.get(i).getBonus());
                 
                 totalBonusesSum += bonuses.get(i).getBonus();
                 
             }
 
-            totalBonuses.setText("" + totalBonusesSum);
+            totalBonuses.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalBonusesSum));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             totalBonuses.setText("");
@@ -163,26 +165,26 @@ public class BonusesView extends JPanel {
 
         Double totalBonusesSum = 0d;
         ArrayList<Bonus> bonuses = DatabaseConnection.getBonusDao().getAllBonuses();
-        Object[][] data = new Object[bonuses.size()][7];
+        Object[][] data = new Object[bonuses.size()][8];
         if (bonuses != null && !bonuses.isEmpty()) {
             for (int i = 0; i < bonuses.size(); i++) {
                 User user = DatabaseConnection.getUserDao().getUserById(bonuses.get(i).getUserId());
                 Percentage p = DatabaseConnection.getPercentageDao().getPercentageById(bonuses.get(i).getPercentageId());
-            
+                
                 data[i][0] = bonuses.get(i).getId();
                 data[i][1] = bonuses.get(i).getSaleId();
                 data[i][2] = user.getId();
                 data[i][3] = user.getName()+" "+user.getLastName();
                 data[i][4] = p.getId();
-                data[i][5] = p.getPercentage();
+                data[i][5] = ApplicationStarter.PERCENTAGE_FORMAT.format(p.getPercentage());
                 data[i][6] = ApplicationStarter.formatDate(new Date(bonuses.get(i).getDate()));
-                data[i][7] = bonuses.get(i).getBonus();
+                data[i][7] = ApplicationStarter.CURRENCY_FORMAT.format(bonuses.get(i).getBonus());
                 
                 totalBonusesSum += bonuses.get(i).getBonus();
                 
             }
 
-            totalBonuses.setText("" + totalBonusesSum);
+            totalBonuses.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalBonusesSum));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             totalBonuses.setText("");

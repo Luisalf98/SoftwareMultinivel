@@ -109,7 +109,7 @@ public class SalesView extends JPanel {
                     saleInfoView.setData((Long)table.getValueAt(table.getSelectedRow(), 0));
                     ((CardLayout)panelParent.getLayout()).show(panelParent, SaleInfoView.class.getName());
                 }else{
-                    JOptionPane.showConfirmDialog(null, "Debe seleccionar una venta.");
+                    JOptionPane.showMessageDialog(null, "Debe seleccionar una venta.");
                 }
                 
             }
@@ -143,8 +143,9 @@ public class SalesView extends JPanel {
             User c = DatabaseConnection.getUserDao().getUserById(sale.getBuyerId());
             tableModel.addRow(new Object[]{sale.getId(), c.getId(),
                 c.getName() + " " + c.getLastName(), 
-                ApplicationStarter.formatDate(new Date(sale.getSaleDate())), sale.getTotal()});
-            totalSales.setText(sale.getTotal() + "");
+                ApplicationStarter.formatDate(new Date(sale.getSaleDate())), 
+                ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal())});
+            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal()));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontro el ingreso especificado.");
             totalSales.setText("");
@@ -175,12 +176,12 @@ public class SalesView extends JPanel {
                 data[i][1] = c.getId();
                 data[i][2] = c.getName() + " "+c.getLastName();
                 data[i][3] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
-                data[i][4] = sales.get(i).getTotal();
+                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
                 
                 totalSalesSum += sales.get(i).getTotal();
             }
 
-            totalSales.setText("" + totalSalesSum);
+            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalSalesSum));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             totalSales.setText("");
@@ -200,12 +201,12 @@ public class SalesView extends JPanel {
                 data[i][1] = c.getId();
                 data[i][2] = c.getName() + " "+c.getLastName();
                 data[i][3] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
-                data[i][4] = sales.get(i).getTotal();
+                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
                 
                 totalSalesSum += sales.get(i).getTotal();
             }
 
-            totalSales.setText("" + totalSalesSum);
+            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalSalesSum));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             totalSales.setText("");

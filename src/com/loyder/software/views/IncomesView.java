@@ -5,6 +5,7 @@
  */
 package com.loyder.software.views;
 
+import com.loyder.software.main.ApplicationStarter;
 import com.loyder.software.model.dao.config.DatabaseConnection;
 import com.loyder.software.model.entities.Income;
 import java.awt.BorderLayout;
@@ -106,11 +107,13 @@ public class IncomesView extends JPanel {
 
         if (income != null) {
             tableModel.addRow(new Object[]{income.getId(), income.getSaleId(),
-                income.getTotalSale(), income.getTotalBonus(), income.getTotalIncome()});
+                ApplicationStarter.CURRENCY_FORMAT.format(income.getTotalSale()),
+                ApplicationStarter.CURRENCY_FORMAT.format(income.getTotalBonus()),
+                ApplicationStarter.CURRENCY_FORMAT.format(income.getTotalIncome())});
             
-            totalBonuses.setText(income.getTotalBonus() + "");
-            totalIncomes.setText(income.getTotalIncome() + "");
-            totalSales.setText(income.getTotalSale() + "");
+            totalBonuses.setText(ApplicationStarter.CURRENCY_FORMAT.format(income.getTotalBonus()));
+            totalIncomes.setText(ApplicationStarter.CURRENCY_FORMAT.format(income.getTotalIncome()));
+            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(income.getTotalSale()));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontro el ingreso especificado.");
             totalBonuses.setText("");
@@ -142,18 +145,18 @@ public class IncomesView extends JPanel {
             for (int i = 0; i < incomes.size(); i++) {
                 data[i][0] = incomes.get(i).getId();
                 data[i][1] = incomes.get(i).getSaleId();
-                data[i][2] = incomes.get(i).getTotalSale();
-                data[i][3] = incomes.get(i).getTotalBonus();
-                data[i][4] = incomes.get(i).getTotalIncome();
+                data[i][2] = ApplicationStarter.CURRENCY_FORMAT.format(incomes.get(i).getTotalSale());
+                data[i][3] = ApplicationStarter.CURRENCY_FORMAT.format(incomes.get(i).getTotalBonus());
+                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(incomes.get(i).getTotalIncome());
                 
                 totalBonusesSum+=incomes.get(i).getTotalBonus();
                 totalIncomesSum+=incomes.get(i).getTotalIncome();
                 totalSalesSum+=incomes.get(i).getTotalSale();
             }
             
-            totalIncomes.setText(""+totalIncomesSum);
-            totalBonuses.setText(""+totalBonusesSum);
-            totalSales.setText(""+totalSalesSum);
+            totalIncomes.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalIncomesSum));
+            totalBonuses.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalBonusesSum));
+            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalSalesSum));
         }else{
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             totalIncomes.setText("");
@@ -175,18 +178,18 @@ public class IncomesView extends JPanel {
             for (int i = 0; i < incomes.size(); i++) {
                 data[i][0] = incomes.get(i).getId();
                 data[i][1] = incomes.get(i).getSaleId();
-                data[i][2] = incomes.get(i).getTotalSale();
-                data[i][3] = incomes.get(i).getTotalBonus();
-                data[i][4] = incomes.get(i).getTotalIncome();
+                data[i][2] = ApplicationStarter.CURRENCY_FORMAT.format(incomes.get(i).getTotalSale());
+                data[i][3] = ApplicationStarter.CURRENCY_FORMAT.format(incomes.get(i).getTotalBonus());
+                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(incomes.get(i).getTotalIncome());
                 
                 totalBonusesSum+=incomes.get(i).getTotalBonus();
                 totalIncomesSum+=incomes.get(i).getTotalIncome();
                 totalSalesSum+=incomes.get(i).getTotalSale();
             }
             
-            totalIncomes.setText(""+totalIncomesSum);
-            totalBonuses.setText(""+totalBonusesSum);
-            totalSales.setText(""+totalSalesSum);
+            totalIncomes.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalIncomesSum));
+            totalBonuses.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalBonusesSum));
+            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalSalesSum));
         }else{
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             totalIncomes.setText("");

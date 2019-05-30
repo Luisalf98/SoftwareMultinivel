@@ -5,6 +5,7 @@
  */
 package com.loyder.software.views;
 
+import com.loyder.software.main.ApplicationStarter;
 import com.loyder.software.model.dao.config.DatabaseConnection;
 import com.loyder.software.model.entities.Percentage;
 import java.awt.BorderLayout;
@@ -16,8 +17,11 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -165,7 +169,7 @@ public class PercentagesView extends JPanel {
 
         if (percentage != null) {
            tableModel.addRow(new Object[]{percentage.getId(),
-                percentage.getPercentage()});
+                ApplicationStarter.PERCENTAGE_FORMAT.format(percentage.getPercentage())});
         } else {
             JOptionPane.showMessageDialog(this, "No se encontro el producto con el código especificado.");
         }
@@ -180,7 +184,7 @@ public class PercentagesView extends JPanel {
         if (percentages != null && !percentages.isEmpty()) {
             percentages.forEach((percentage) -> {
                 tableModel.addRow(new Object[]{percentage.getId(),
-                    percentage.getPercentage()});
+                    ApplicationStarter.PERCENTAGE_FORMAT.format(percentage.getPercentage())});
             });
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
@@ -240,7 +244,7 @@ public class PercentagesView extends JPanel {
 
         this.labelRegisterPercentage = new JLabel("<html>Porcentaje (Utilice coma (,)<br> en vez de punto decimal): </html>");
 
-        this.textFieldPercentageValue = new JFormattedTextField(0D);
+        this.textFieldPercentageValue = new JFormattedTextField(ApplicationStarter.PERCENTAGE_FORMAT);
         this.textFieldPercentageValue.setValue(null);
         this.textFieldPercentageValue.setText("");
         this.textFieldPercentageValue.setPreferredSize(preferredTextFieldsSize);
@@ -248,8 +252,8 @@ public class PercentagesView extends JPanel {
         this.addPercentageButton = new JButton("Agregar un nivel");
         
         this.labelUpdatePercentage = new JLabel("<html>Porcentaje (Utilice coma (,)<br> en vez de punto decimal): </html>");
-
-        this.updateTextFieldPercentageValue = new JFormattedTextField(0D);
+        
+        this.updateTextFieldPercentageValue = new JFormattedTextField(ApplicationStarter.PERCENTAGE_FORMAT);
         this.updateTextFieldPercentageValue.setValue(null);
         this.updateTextFieldPercentageValue.setText("");
         this.updateTextFieldPercentageValue.setPreferredSize(preferredTextFieldsSize);

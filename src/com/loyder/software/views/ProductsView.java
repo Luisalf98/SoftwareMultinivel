@@ -5,6 +5,7 @@
  */
 package com.loyder.software.views;
 
+import com.loyder.software.main.ApplicationStarter;
 import com.loyder.software.model.dao.config.DatabaseConnection;
 import com.loyder.software.model.entities.Product;
 import java.awt.BorderLayout;
@@ -22,11 +23,13 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -49,8 +52,12 @@ public class ProductsView extends JPanel {
     private JPanel searchPaneFlowLayoutGridLayout;
     private JPanel bodyBoxLayout;
     private JPanel bodyRegisterPanelGridBag;
-    private JPanel bodyUpdatePanelGridBag;
-    private JPanel bodyRegisterPanelFlow;
+    private JPanel manageProducts;
+    private JPanel deleteProducts;
+    private JPanel panelRadioButtons;
+    private JRadioButton radioButtonRegister;
+    private JRadioButton radioButtonUpdate;
+    private ButtonGroup buttonGroup;
     private JLabel idSearchLabel;
     private JLabel nameSearchLabel;
     private JButton nameSearchButton;
@@ -62,13 +69,11 @@ public class ProductsView extends JPanel {
     private JLabel productName;
     private JLabel productDescription;
     private JLabel productPrice;
-    private JLabel updateProductPrice;
     private JTextField productNameValue;
     private JTextArea productDescriptionValue;
     private JFormattedTextField productPriceValue;
-    private JFormattedTextField updateProductPriceValue;
-    private JButton addProductButton;
-    private JButton updateProductButton;
+    private JButton manageProductButton;
+    private JButton deleteProductButton;
 
     private static final String[] TABLE_MODEL_IDENTIFIERS = {"Código", "Nombre", "Descripción",
         "Precio"};
@@ -94,29 +99,82 @@ public class ProductsView extends JPanel {
                 showAllProducts(e);
             }
         });
-        addProductButton.addMouseListener(new MouseAdapter() {
+        manageProductButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (!addNewProduct(e)) {
-                    JOptionPane.showMessageDialog(null, "No se pudo registrar el producto.");
+                if (!manageProduct(e)) {
+                    JOptionPane.showMessageDialog(null, "No se pudo realizar la operación.");
                 } else {
-                    JOptionPane.showMessageDialog(null, "Registro exitoso!");
+                    JOptionPane.showMessageDialog(null, "Operación exitosa!");
                 }
             }
         });
-        updateProductButton.addMouseListener(new MouseAdapter() {
+        deleteProductButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (!updateProduct(e)) {
-                    JOptionPane.showMessageDialog(null, "No se pudo actualizar el producto.");
+                if (!deleteProduct(e)) {
+                    JOptionPane.showMessageDialog(null, "No se pudo realizar la operación.");
                 } else {
-                    JOptionPane.showMessageDialog(null, "Actualización exitosa!");
+                    JOptionPane.showMessageDialog(null, "Operación exitosa!");
+                }
+            }
+        });
+        this.radioButtonRegister.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                productDescriptionValue.setText("");
+                productNameValue.setText("");
+                productPriceValue.setValue(null);
+                productPriceValue.setText("");
+            }
+        });
+        this.radioButtonUpdate.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (table.getSelectedRow() != -1) {
+                    Long cod = (Long) table.getValueAt(table.getSelectedRow(), 0);
+                    Product p = DatabaseConnection.getProductDao().getProductById(cod);
+                    productDescriptionValue.setText(p.getDescription());
+                    productNameValue.setText(p.getName());
+                    productPriceValue.setValue(p.getPrice());
+                } else {
+                    productDescriptionValue.setText("");
+                    productNameValue.setText("");
+                    productPriceValue.setValue(null);
+                    productPriceValue.setText("");
+                }
+            }
+        });
+        this.table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (table.getSelectedRow() != -1 && radioButtonUpdate.isSelected()) {
+                    Long cod = (Long) table.getValueAt(table.getSelectedRow(), 0);
+                    Product p = DatabaseConnection.getProductDao().getProductById(cod);
+                    productDescriptionValue.setText(p.getDescription());
+                    productNameValue.setText(p.getName());
+                    productPriceValue.setValue(p.getPrice());
                 }
             }
         });
     }
+    
+    public boolean deleteProduct(MouseEvent e){
+        if(table.getSelectedRow()==-1){
+            JOptionPane.showMessageDialog(null, "No seleccionó ningún producto.");
+            return false;
+        }
+        
+        Long id = (Long)table.getValueAt(table.getSelectedRow(), 0);
+        return DatabaseConnection.getProductDao().removeProductById(id);
+    }
 
-    public boolean addNewProduct(MouseEvent e) {
+    public boolean manageProduct(MouseEvent e) {
+        if(table.getSelectedRow()==-1 && radioButtonUpdate.isSelected()){
+            JOptionPane.showMessageDialog(null, "Ningún producto seleccionado.");
+            return false;
+        }
+        
         Double price = (Double) productPriceValue.getValue();
         if (price == null) {
             JOptionPane.showMessageDialog(null, "El campo Precio está vacío o el valor digitado es inválido.");
@@ -132,34 +190,19 @@ public class ProductsView extends JPanel {
             JOptionPane.showMessageDialog(null, "El campo Precio está vacío o el valor digitado es inválido.");
             return false;
         }
-        
+
         this.productDescriptionValue.setText("");
         this.productNameValue.setText("");
         this.productPriceValue.setText("");
         this.productPriceValue.setValue(null);
 
-        Product p = new Product(null, name, description, price);
-        return DatabaseConnection.getProductDao().addProduct(p);
-    }
-    
-    public boolean updateProduct(MouseEvent e) {
-        Double price = (Double) updateProductPriceValue.getValue();
-        if (price == null) {
-            JOptionPane.showMessageDialog(null, "El campo Precio está vacío o el valor digitado es inválido.");
-            return false;
-        }
-        if(table.getSelectedRow()==-1){
-            JOptionPane.showMessageDialog(null, "Debe seleccionar un producto!");
-            return false;
+        if (radioButtonRegister.isSelected()) {
+            Product p = new Product(null, name, description, price);
+            return DatabaseConnection.getProductDao().addProduct(p);
         }
         
-        Long id = (Long) table.getValueAt(table.getSelectedRow(), 0);
-        String name = (String) table.getValueAt(table.getSelectedRow(), 1);
-        String description = (String) table.getValueAt(table.getSelectedRow(), 2);
-        this.updateProductPriceValue.setText("");
-        this.updateProductPriceValue.setValue(null);
-
-        Product p = new Product(id, name, description, price);
+        Long cod = (Long)table.getValueAt(table.getSelectedRow(), 0);
+        Product p = new Product(cod, name, description, price);
         return DatabaseConnection.getProductDao().updateProduct(p);
     }
 
@@ -178,7 +221,7 @@ public class ProductsView extends JPanel {
 
         if (product != null) {
             tableModel.addRow(new Object[]{product.getId(), product.getName(),
-                product.getDescription(), product.getPrice()});
+                product.getDescription(), ApplicationStarter.CURRENCY_FORMAT.format(product.getPrice())});
         } else {
             JOptionPane.showMessageDialog(this, "No se encontro el producto con el código especificado.");
         }
@@ -200,7 +243,7 @@ public class ProductsView extends JPanel {
         if (products != null && !products.isEmpty()) {
             products.forEach((product) -> {
                 tableModel.addRow(new Object[]{product.getId(), product.getName(),
-                    product.getDescription(), product.getPrice()});
+                    product.getDescription(), ApplicationStarter.CURRENCY_FORMAT.format(product.getPrice())});
             });
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
@@ -215,7 +258,7 @@ public class ProductsView extends JPanel {
         if (products != null && !products.isEmpty()) {
             products.forEach((product) -> {
                 tableModel.addRow(new Object[]{product.getId(), product.getName(),
-                    product.getDescription(), product.getPrice()});
+                    product.getDescription(), ApplicationStarter.CURRENCY_FORMAT.format(product.getPrice())});
             });
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
@@ -283,8 +326,6 @@ public class ProductsView extends JPanel {
         searchPaneFlowLayout.add(searchPaneFlowLayoutGridLayout);
         searchPane.add(searchPaneFlowLayout);
 
-        addProductButton = new JButton("Agregar nuevo");
-
         bodyBoxLayout = new JPanel();
         BoxLayout b = new BoxLayout(bodyBoxLayout, BoxLayout.X_AXIS);
         bodyBoxLayout.setLayout(b);
@@ -292,8 +333,6 @@ public class ProductsView extends JPanel {
         this.productName = new JLabel("Nombre: ");
         this.productDescription = new JLabel("Descripción: ");
         this.productPrice = new JLabel("Precio: ");
-        
-        this.updateProductPrice = new JLabel("Precio: ");
 
         this.productNameValue = new JTextField();
         this.productDescriptionValue = new JTextArea(10, 20);
@@ -304,25 +343,10 @@ public class ProductsView extends JPanel {
         this.productPriceValue = new JFormattedTextField(0D);
         this.productPriceValue.setValue(null);
         this.productPriceValue.setText("");
-        
-        this.updateProductPriceValue = new JFormattedTextField(0D);
-        this.updateProductPriceValue.setValue(null);
-        this.updateProductPriceValue.setText("");
-        this.updateProductPriceValue.setPreferredSize(preferredTextFieldsSize);
 
-        this.addProductButton = new JButton("Registrar producto");
-
-        this.updateProductButton = new JButton("Actualizar producto");
-
-        this.bodyRegisterPanelFlow = new JPanel();
-        BoxLayout bl = new BoxLayout(this.bodyRegisterPanelFlow, BoxLayout.Y_AXIS);
-        this.bodyRegisterPanelFlow.setLayout(bl);
+        this.manageProductButton = new JButton("Enviar");
 
         this.bodyRegisterPanelGridBag = new JPanel(new GridBagLayout());
-        this.bodyRegisterPanelGridBag.setBorder(BorderFactory.createTitledBorder("Nuevo Producto"));
-        
-        this.bodyUpdatePanelGridBag = new JPanel(new GridBagLayout());
-        this.bodyUpdatePanelGridBag.setBorder(BorderFactory.createTitledBorder("Actualizar Producto Seleccionado"));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -358,32 +382,34 @@ public class ProductsView extends JPanel {
         gbc.gridy = 3;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
-        this.bodyRegisterPanelGridBag.add(this.addProductButton, gbc);
+        this.bodyRegisterPanelGridBag.add(this.manageProductButton, gbc);
+
+        this.manageProducts = new JPanel(new BorderLayout(10, 10));
+        this.manageProducts.setBorder(BorderFactory.createTitledBorder("Gestionar Productos"));
+
+        this.panelRadioButtons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+
+        this.radioButtonRegister = new JRadioButton("Nuevo Producto", true);
+        this.radioButtonUpdate = new JRadioButton("Actualizar Producto");
+
+        this.buttonGroup = new ButtonGroup();
+        this.buttonGroup.add(this.radioButtonRegister);
+        this.buttonGroup.add(this.radioButtonUpdate);
+
+        this.panelRadioButtons.add(this.radioButtonRegister);
+        this.panelRadioButtons.add(this.radioButtonUpdate);
+
+        this.deleteProducts = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
         
-        gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.NORTHEAST;
+        this.deleteProductButton = new JButton("Eliminar Producto");
         
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.NONE;
-        this.bodyUpdatePanelGridBag.add(this.updateProductPrice, gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.BOTH;
-        this.bodyUpdatePanelGridBag.add(this.updateProductPriceValue, gbc);
+        this.deleteProducts.add(this.deleteProductButton);
+        
+        this.manageProducts.add(this.bodyRegisterPanelGridBag, BorderLayout.CENTER);
+        this.manageProducts.add(this.panelRadioButtons, BorderLayout.NORTH);
+        this.manageProducts.add(this.deleteProducts, BorderLayout.SOUTH);
 
-        gbc.gridwidth = 2;
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-        this.bodyUpdatePanelGridBag.add(this.updateProductButton, gbc);
-
-        this.bodyRegisterPanelFlow.add(this.bodyRegisterPanelGridBag);
-        this.bodyRegisterPanelFlow.add(this.bodyUpdatePanelGridBag);
-
-        this.bodyBoxLayout.add(this.bodyRegisterPanelFlow);
+        this.bodyBoxLayout.add(this.manageProducts);
         this.bodyBoxLayout.add(this.tableScroll);
 
         this.add(this.bodyBoxLayout, BorderLayout.CENTER);

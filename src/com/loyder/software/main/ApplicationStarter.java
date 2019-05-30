@@ -11,9 +11,11 @@ import com.loyder.software.views.MainWindow;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -29,7 +31,18 @@ public class ApplicationStarter {
     /**
      */
     
-    public static final User COMPANY_ROOT = new User(-1L, -1L, "COMPANY_ROOT", "", "", "", "", -2L, 0L, -1L);
+    public static final User COMPANY_ROOT = new User(-1L, 9005370698L, "SANDYL", "", "Calle 60 # 27 - 46", "320 0550", "318 721 4616", -2L, 0L, -1L);
+    public static final Locale LOCALE = new Locale("es", "CO");
+    public static final NumberFormat PERCENTAGE_FORMAT = NumberFormat.getPercentInstance(LOCALE);
+    public static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance(LOCALE);
+    public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(LOCALE);
+    
+    static{
+        PERCENTAGE_FORMAT.setMinimumFractionDigits(0);
+        PERCENTAGE_FORMAT.setMaximumFractionDigits(2);
+        NUMBER_FORMAT.setMaximumFractionDigits(2);
+        NUMBER_FORMAT.setMinimumFractionDigits(0);
+    }
     
     public static void main(String[] args) {
         try {

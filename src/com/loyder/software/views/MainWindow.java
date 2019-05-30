@@ -97,13 +97,13 @@ public class MainWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        incomesPanel = new javax.swing.JPanel();
-        salesPanel = new javax.swing.JPanel();
         usersPanel = new javax.swing.JPanel();
-        bonusesPanel = new javax.swing.JPanel();
+        salesPanel = new javax.swing.JPanel();
         productsPanel = new javax.swing.JPanel();
-        percentagesPanel = new javax.swing.JPanel();
         categoriesPanel = new javax.swing.JPanel();
+        percentagesPanel = new javax.swing.JPanel();
+        bonusesPanel = new javax.swing.JPanel();
+        incomesPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Software Multinivel");
@@ -113,33 +113,33 @@ public class MainWindow extends javax.swing.JFrame {
         jTabbedPane1.setTabPlacement(javax.swing.JTabbedPane.LEFT);
         jTabbedPane1.setToolTipText("");
 
-        incomesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
-        incomesPanel.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Ingresos", incomesPanel);
+        usersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Usuarios", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
+        usersPanel.setLayout(new java.awt.CardLayout());
+        jTabbedPane1.addTab("Usuarios", usersPanel);
 
         salesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ventas", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
         salesPanel.setLayout(new java.awt.CardLayout());
         jTabbedPane1.addTab("Ventas", salesPanel);
 
-        usersPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Usuarios", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
-        usersPanel.setLayout(new java.awt.CardLayout());
-        jTabbedPane1.addTab("Usuarios", usersPanel);
-
-        bonusesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Bonificaciones", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
-        bonusesPanel.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Bonificaciones", bonusesPanel);
-
         productsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Productos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
         productsPanel.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("Productos", productsPanel);
+
+        categoriesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Categorías", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
+        categoriesPanel.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab("Categorías", categoriesPanel);
 
         percentagesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Porcentajes", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
         percentagesPanel.setLayout(new java.awt.BorderLayout());
         jTabbedPane1.addTab("Porcentajes", percentagesPanel);
 
-        categoriesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Categorías", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
-        categoriesPanel.setLayout(new java.awt.BorderLayout());
-        jTabbedPane1.addTab("Categorías", categoriesPanel);
+        bonusesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Bonificaciones", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
+        bonusesPanel.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab("Bonificaciones", bonusesPanel);
+
+        incomesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Ingresos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 18))); // NOI18N
+        incomesPanel.setLayout(new java.awt.BorderLayout());
+        jTabbedPane1.addTab("Ingresos", incomesPanel);
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
