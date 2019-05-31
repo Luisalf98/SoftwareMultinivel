@@ -41,6 +41,7 @@ public class IUserDao implements UserDao {
     private static final String SQL_GET_USER_CHILDS_BY_ID_AND_CHILD_NAME = "SELECT "+UsersTableField.rowid+",* FROM "+Table.USERS+" WHERE "+UsersTableField.adder_id+"=? AND ("+UsersTableField.name+" LIKE ? OR "+UsersTableField.last_name+" LIKE ?)";
     private static final String SQL_GET_USER_CHILD_BY_ID_AND_CHILD_ID = "SELECT "+UsersTableField.rowid+",* FROM "+Table.USERS+" WHERE "+UsersTableField.adder_id+"=? AND "+UsersTableField.rowid+"=?";
     private static final String SQL_GET_USER_CHILD_BY_ID_AND_CHILD_USER_ID = "SELECT "+UsersTableField.rowid+",* FROM "+Table.USERS+" WHERE "+UsersTableField.adder_id+"=? AND "+UsersTableField.user_id+"=?";
+    private static final String SQL_UPDATE_USER = String.format("UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?", Table.USERS, UsersTableField.user_id, UsersTableField.name, UsersTableField.last_name, UsersTableField.address, UsersTableField.tel, UsersTableField.cel, UsersTableField.category_id, UsersTableField.rowid);
     
     private IUserDao(){}
     
@@ -405,6 +406,30 @@ public class IUserDao implements UserDao {
             JOptionPane.showMessageDialog(null, IUserDao.class.getName()+"::getAllUsersByCategoryId(): "+ex.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public boolean updateUser(User user) {
+        Connection conn = DatabaseConfig.getConnection();
+        if(conn == null){
+            JOptionPane.showMessageDialog(null, IUserDao.class.getName()+"::updateUser(): No se pudo establecer conexión con la base de datos.");
+            return false;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_UPDATE_USER)) {
+            pstmt.setLong(1, user.getUserId());
+            pstmt.setString(2, user.getName());
+            pstmt.setString(3, user.getLastName());
+            pstmt.setString(4, user.getAddress());
+            pstmt.setString(5, user.getTel());
+            pstmt.setString(6, user.getCel());
+            pstmt.setLong(7, user.getCategoryId());
+            pstmt.setLong(8, user.getId());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, IUserDao.class.getName()+"::updateUser(): "+ex.getMessage());
+        }
+        return false;
     }
 
 

@@ -5,11 +5,13 @@
  */
 package com.loyder.software.model.entities;
 
+import java.util.Objects;
+
 /**
  *
  * @author Luis Perez
  */
-public class Category {
+public class Category{
     
     private Long id;
     private String name;
@@ -42,7 +44,14 @@ public class Category {
     public String toString() {
         return this.name; //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
-    
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Category){
+            Category c2 = (Category)obj;
+            return Objects.equals(this.id, c2.id); //To change body of generated methods, choose Tools | Templates.
+        }
+        return false;
+    }
+
 }

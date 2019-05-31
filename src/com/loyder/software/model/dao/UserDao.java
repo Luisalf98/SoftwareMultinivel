@@ -16,6 +16,7 @@ public interface UserDao {
     
     public boolean removeUserById(Long id);
     public boolean addUser(User user);
+    public boolean updateUser(User user);
     public User getUserById(Long userId);
     public User getUserByUserId(Long userId);
     public ArrayList<User> getUsersByName(String name);
