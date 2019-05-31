@@ -145,7 +145,8 @@ public class SaleInfoView extends JPanel{
             Product p = DatabaseConnection.getProductDao().getProductById(detail.getProductId());
             detailsTableModel.addRow(new Object[]{
                 p.getId(), p.getName(), p.getDescription(),
-                p.getPrice(), detail.getQuantity(), detail.getQuantity()*p.getPrice()
+                ApplicationStarter.CURRENCY_FORMAT.format(p.getPrice()), detail.getQuantity(),
+                ApplicationStarter.CURRENCY_FORMAT.format(detail.getQuantity()*p.getPrice())
             });
         });
         
@@ -155,8 +156,9 @@ public class SaleInfoView extends JPanel{
             Percentage p = DatabaseConnection.getPercentageDao().getPercentageById(bonus.getPercentageId());
             User u = DatabaseConnection.getUserDao().getUserById(bonus.getUserId());
             bonusesTableModel.addRow(new Object[]{
-                bonus.getId(), p.getId(), p.getPercentage(),
-                bonus.getBonus(), ApplicationStarter.formatDate(new Date(bonus.getDate())), u.getId(),
+                bonus.getId(), p.getId(), ApplicationStarter.PERCENTAGE_FORMAT.format(p.getPercentage()),
+                ApplicationStarter.CURRENCY_FORMAT.format(bonus.getBonus()),
+                ApplicationStarter.formatDate(new Date(bonus.getDate())), u.getId(),
                 u.getUserId(), u.getName()+" "+u.getLastName()
             });
         });

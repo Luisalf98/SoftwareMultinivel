@@ -148,8 +148,10 @@ public class UserPurchasesView extends JPanel{
         this.purchasesTableModel.setDataVector(EMPTY_TABLE, PURCHASES_HEADER);
 
         if (sale != null) {
-            purchasesTableModel.addRow(new Object[]{sale.getId(), ApplicationStarter.formatDate(new Date(sale.getSaleDate())),
-                sale.getTotal(), sale.getType(), sale.getState()});
+            purchasesTableModel.addRow(new Object[]{sale.getId(), 
+                ApplicationStarter.formatDate(new Date(sale.getSaleDate())),
+                ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal()),
+                sale.getType(), sale.getState()});
         } else {
             JOptionPane.showMessageDialog(this, "No se encontro la compra con el código especificado.");
         }
@@ -171,8 +173,10 @@ public class UserPurchasesView extends JPanel{
 
         if (sales != null && !sales.isEmpty()) {
             sales.forEach((sale)->{
-                purchasesTableModel.addRow(new Object[]{sale.getId(), ApplicationStarter.formatDate(new Date(sale.getSaleDate())),
-                sale.getTotal(), sale.getType(), sale.getState()});
+                purchasesTableModel.addRow(new Object[]{sale.getId(), 
+                    ApplicationStarter.formatDate(new Date(sale.getSaleDate())),
+                ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal()),
+                sale.getType(), sale.getState()});
             });
             
         } else {
@@ -187,8 +191,10 @@ public class UserPurchasesView extends JPanel{
 
         if (sales != null && !sales.isEmpty()) {
             sales.forEach((sale)->{
-                purchasesTableModel.addRow(new Object[]{sale.getId(), ApplicationStarter.formatDate(new Date(sale.getSaleDate())),
-                sale.getTotal(), sale.getType(), sale.getState()});
+                purchasesTableModel.addRow(new Object[]{sale.getId(), 
+                    ApplicationStarter.formatDate(new Date(sale.getSaleDate())),
+                ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal()), 
+                sale.getType(), sale.getState()});
             });
             
         } else {

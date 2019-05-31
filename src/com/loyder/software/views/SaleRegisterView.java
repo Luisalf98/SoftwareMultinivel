@@ -562,7 +562,7 @@ public class SaleRegisterView extends javax.swing.JPanel {
         if (products != null && !products.isEmpty()) {
             products.forEach(product -> {
                 tableProductsModel.addRow(new Object[]{product.getId(), product.getName(),
-                    product.getDescription(), product.getPrice()
+                    product.getDescription(), ApplicationStarter.CURRENCY_FORMAT.format(product.getPrice())
                 });
             });
         } else {
@@ -586,7 +586,7 @@ public class SaleRegisterView extends javax.swing.JPanel {
 
         if (product != null) {
             tableProductsModel.addRow(new Object[]{product.getId(), product.getName(),
-                product.getDescription(), product.getPrice()
+                product.getDescription(), ApplicationStarter.CURRENCY_FORMAT.format(product.getPrice())
             });
         } else {
             JOptionPane.showMessageDialog(null, "No se encontró el producto con el código especificado.");
@@ -609,7 +609,7 @@ public class SaleRegisterView extends javax.swing.JPanel {
         if (products != null && !products.isEmpty()) {
             products.forEach(product -> {
                 tableProductsModel.addRow(new Object[]{product.getId(), product.getName(),
-                    product.getDescription(), product.getPrice()
+                    product.getDescription(), ApplicationStarter.CURRENCY_FORMAT.format(product.getPrice())
                 });
             });
         } else {
@@ -708,7 +708,8 @@ public class SaleRegisterView extends javax.swing.JPanel {
         Double price = (Double) tableProducts.getValueAt(tableProducts.getSelectedRow(), 3);
         Double total = quantity * price;
         tableProductsBillModel.addRow(new Object[]{
-            productId, name, price, quantity, total
+            productId, name, ApplicationStarter.CURRENCY_FORMAT.format(price), quantity, 
+            ApplicationStarter.CURRENCY_FORMAT.format(total)
         });
 
         this.saleTotal += total;

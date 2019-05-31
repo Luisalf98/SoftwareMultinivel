@@ -217,10 +217,11 @@ public class UserInfoView extends JPanel{
         if (bonus != null) {
             Percentage p = DatabaseConnection.getPercentageDao().getPercentageById(bonus.getPercentageId());
             bonusesTableModel.addRow(new Object[]{bonus.getId(), p.getId(), 
-                p.getPercentage(), bonus.getBonus(),
+                ApplicationStarter.PERCENTAGE_FORMAT.format(p.getPercentage()), 
+                ApplicationStarter.CURRENCY_FORMAT.format(bonus.getBonus()),
                 bonus.getSaleId(),
                 ApplicationStarter.formatDate(new Date(bonus.getDate()))});
-            labelTotalBonusesValue.setText(bonus.getBonus()+ "");
+            labelTotalBonusesValue.setText(ApplicationStarter.CURRENCY_FORMAT.format(bonus.getBonus()));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontro la bonificación especificada.");
             labelTotalBonusesValue.setText("");
@@ -248,8 +249,8 @@ public class UserInfoView extends JPanel{
                 Percentage p = DatabaseConnection.getPercentageDao().getPercentageById(bonuses.get(i).getPercentageId());
                 data[i][0] = bonuses.get(i).getId();
                 data[i][1] = p.getId();
-                data[i][2] = p.getPercentage();
-                data[i][3] = bonuses.get(i).getBonus();
+                data[i][2] = ApplicationStarter.PERCENTAGE_FORMAT.format(p.getPercentage());
+                data[i][3] = ApplicationStarter.CURRENCY_FORMAT.format(bonuses.get(i).getBonus());
                 data[i][4] = bonuses.get(i).getSaleId();
                 data[i][5] = ApplicationStarter.formatDate(new Date(bonuses.get(i).getDate()));
                 
@@ -257,7 +258,7 @@ public class UserInfoView extends JPanel{
                 
             }
 
-            labelTotalBonusesValue.setText("" + totalBonusesSum);
+            labelTotalBonusesValue.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalBonusesSum));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             labelTotalBonusesValue.setText("");
@@ -275,8 +276,8 @@ public class UserInfoView extends JPanel{
                 Percentage p = DatabaseConnection.getPercentageDao().getPercentageById(bonuses.get(i).getPercentageId());
                 data[i][0] = bonuses.get(i).getId();
                 data[i][1] = p.getId();
-                data[i][2] = p.getPercentage();
-                data[i][3] = bonuses.get(i).getBonus();
+                data[i][2] = ApplicationStarter.PERCENTAGE_FORMAT.format(p.getPercentage());
+                data[i][3] = ApplicationStarter.CURRENCY_FORMAT.format(bonuses.get(i).getBonus());
                 data[i][4] = bonuses.get(i).getSaleId();
                 data[i][5] = ApplicationStarter.formatDate(new Date(bonuses.get(i).getDate()));
                 
@@ -284,7 +285,7 @@ public class UserInfoView extends JPanel{
                 
             }
 
-            labelTotalBonusesValue.setText("" + totalBonusesSum);
+            labelTotalBonusesValue.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalBonusesSum));
         } else {
             JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
             labelTotalBonusesValue.setText("");
