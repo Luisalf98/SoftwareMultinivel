@@ -29,7 +29,7 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="buttonGoBack">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Cancelar"/>
+            <Property name="text" type="java.lang.String" value="Atr&#xe1;s"/>
           </Properties>
         </Component>
       </SubComponents>

@@ -81,6 +81,8 @@ public class DatabaseConfig {
     }
     
     public enum SaleState{
+        SOLICITADA,
+        ELIMINADA,
         NO_PAGADA,
         PAGADA;
     }

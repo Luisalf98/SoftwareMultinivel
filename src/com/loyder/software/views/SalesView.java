@@ -6,6 +6,8 @@
 package com.loyder.software.views;
 
 import com.loyder.software.main.ApplicationStarter;
+import com.loyder.software.model.dao.config.DatabaseConfig.SaleState;
+import com.loyder.software.model.dao.config.DatabaseConfig.SaleType;
 import com.loyder.software.model.dao.config.DatabaseConnection;
 import com.loyder.software.model.entities.Sale;
 import com.loyder.software.model.entities.User;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -65,8 +68,12 @@ public class SalesView extends JPanel {
     private JLabel totalSales;
     private JButton seeDetailsButton;
     private JButton addNewSaleButton;
+    
+    private JLabel filters;
+    private JComboBox comboBoxTypes;
+    private JComboBox comboBoxStates;
 
-    private static final String[] TABLE_MODEL_IDENTIFIERS = {"Código Venta", "Código Cliente", "Nombre Cliente", "Fecha",
+    private static final String[] TABLE_MODEL_IDENTIFIERS = {"Código Venta", "Estado", "Tipo", "Código Cliente", "Nombre Cliente", "Fecha",
         "Total Venta"};
     private static final String[][] EMPTY_TABLE = new String[0][0];
     
@@ -141,7 +148,7 @@ public class SalesView extends JPanel {
 
         if (sale != null) {
             User c = DatabaseConnection.getUserDao().getUserById(sale.getBuyerId());
-            tableModel.addRow(new Object[]{sale.getId(), c.getId(),
+            tableModel.addRow(new Object[]{sale.getId(), sale.getState(), sale.getType(), c.getId(),
                 c.getName() + " " + c.getLastName(), 
                 ApplicationStarter.formatDate(new Date(sale.getSaleDate())), 
                 ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal())});
@@ -160,6 +167,21 @@ public class SalesView extends JPanel {
             JOptionPane.showMessageDialog(this, "Formato de fecha incorrecto.");
             return;
         }
+        
+        String stateFilter;
+        String typeFilter;
+        
+        if(this.comboBoxStates.getSelectedIndex() == -1 || ((String)this.comboBoxStates.getSelectedItem()).equals("NINGUNO")){
+            stateFilter = "%";
+        }else{
+            stateFilter = ((String)this.comboBoxStates.getSelectedItem());
+        }
+        
+        if(this.comboBoxStates.getSelectedIndex() == -1 || ((String)this.comboBoxStates.getSelectedItem()).equals("NINGUNO")){
+            typeFilter = "%";
+        }else{
+            typeFilter = ((String)this.comboBoxTypes.getSelectedItem());
+        }
 
         date1TextField.setValue(null);
         date2TextField.setValue(null);
@@ -167,16 +189,18 @@ public class SalesView extends JPanel {
         date2TextField.setText("");
 
         Double totalSalesSum = 0d;
-        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getSalesInDateRange(date1, date2);
+        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getSalesInDateRange(date1, date2, stateFilter, typeFilter);
         Object[][] data = new Object[sales.size()][5];
         if (sales != null && !sales.isEmpty()) {
             for (int i = 0; i < sales.size(); i++) {
                 User  c = DatabaseConnection.getUserDao().getUserById(sales.get(i).getBuyerId());
                 data[i][0] = sales.get(i).getId();
-                data[i][1] = c.getId();
-                data[i][2] = c.getName() + " "+c.getLastName();
-                data[i][3] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
-                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
+                data[i][1] = sales.get(i).getState();
+                data[i][2] = sales.get(i).getType();
+                data[i][3] = c.getId();
+                data[i][4] = c.getName() + " "+c.getLastName();
+                data[i][5] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
+                data[i][6] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
                 
                 totalSalesSum += sales.get(i).getTotal();
             }
@@ -192,16 +216,34 @@ public class SalesView extends JPanel {
     
     public void showAllSales(MouseEvent e) {
         Double totalSalesSum = 0d;
-        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getAllSales();
+        
+        String stateFilter;
+        String typeFilter;
+        
+        if(this.comboBoxStates.getSelectedIndex() == -1 || ((String)this.comboBoxStates.getSelectedItem()).equals("NINGUNO")){
+            stateFilter = "%";
+        }else{
+            stateFilter = ((String)this.comboBoxStates.getSelectedItem());
+        }
+        
+        if(this.comboBoxTypes.getSelectedIndex() == -1 || ((String)this.comboBoxTypes.getSelectedItem()).equals("NINGUNO")){
+            typeFilter = "%";
+        }else{
+            typeFilter = ((String)this.comboBoxTypes.getSelectedItem());
+        }
+        
+        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getAllSales(stateFilter, typeFilter);
         Object[][] data = new Object[sales.size()][7];
         if (sales != null && !sales.isEmpty()) {
             for (int i = 0; i < sales.size(); i++) {
                 User  c = DatabaseConnection.getUserDao().getUserById(sales.get(i).getBuyerId());
                 data[i][0] = sales.get(i).getId();
-                data[i][1] = c.getId();
-                data[i][2] = c.getName() + " "+c.getLastName();
-                data[i][3] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
-                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
+                data[i][1] = sales.get(i).getState();
+                data[i][2] = sales.get(i).getType();
+                data[i][3] = c.getId();
+                data[i][4] = c.getName() + " "+c.getLastName();
+                data[i][5] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
+                data[i][6] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
                 
                 totalSalesSum += sales.get(i).getTotal();
             }
@@ -249,6 +291,10 @@ public class SalesView extends JPanel {
         dateSearchLabel = new JLabel("Fecha Inicial (dd/mm/yyyy) - Fecha Final (dd/mm/yyyy): ");
         
         buttonShowAllSales = new JButton("Mostrar todo");
+        
+        this.filters = new JLabel("Filtros (Estado | Tipo): ");
+        this.comboBoxStates = new JComboBox(new String[]{"NINGUNO", SaleState.PAGADA.toString(), SaleState.NO_PAGADA.toString(), SaleState.SOLICITADA.toString()});
+        this.comboBoxTypes = new JComboBox(new String[]{"NINGUNO", SaleType.CONTADO.toString(), SaleType.CREDITO.toString()});
 
         searchPaneFlowLayout = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         searchPaneFlowLayoutGridLayout = new JPanel(new GridBagLayout());
@@ -259,22 +305,36 @@ public class SalesView extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        searchPaneFlowLayoutGridLayout.add(idSearchLabel,gbc);
+        searchPaneFlowLayoutGridLayout.add(filters,gbc);
+        JPanel fp = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        fp.add(this.comboBoxStates);
+        fp.add(this.comboBoxTypes);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 1;
         gbc.gridy = 0;
+        searchPaneFlowLayoutGridLayout.add(fp,gbc);
+        
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        searchPaneFlowLayoutGridLayout.add(idSearchLabel,gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridx = 1;
+        gbc.gridy = 1;
         searchPaneFlowLayoutGridLayout.add(idTextField,gbc);
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 2;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         searchPaneFlowLayoutGridLayout.add(idSearchButton,gbc);
 
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         searchPaneFlowLayoutGridLayout.add(dateSearchLabel,gbc);
         datesPane = new JPanel();
         BoxLayout bl = new BoxLayout(datesPane, BoxLayout.X_AXIS);
@@ -284,18 +344,18 @@ public class SalesView extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         searchPaneFlowLayoutGridLayout.add(datesPane,gbc);
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         searchPaneFlowLayoutGridLayout.add(dateSearchButton,gbc);
 
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         searchPaneFlowLayoutGridLayout.add(buttonShowAllSales, gbc);
         
         searchPaneFlowLayout.add(searchPaneFlowLayoutGridLayout);

@@ -7,8 +7,9 @@ package com.loyder.software.model.dao.impl;
 
 import com.loyder.software.model.dao.SaleDao;
 import com.loyder.software.model.dao.config.DatabaseConfig;
+import com.loyder.software.model.dao.config.DatabaseConfig.BonusesTableField;
+import com.loyder.software.model.dao.config.DatabaseConfig.IncomesTableField;
 import com.loyder.software.model.dao.config.DatabaseConfig.SaleState;
-import com.loyder.software.model.dao.config.DatabaseConfig.SaleType;
 import com.loyder.software.model.dao.config.DatabaseConfig.SalesDetailsTableField;
 import com.loyder.software.model.dao.config.DatabaseConfig.SalesTableField;
 import com.loyder.software.model.dao.config.DatabaseConfig.Table;
@@ -46,31 +47,15 @@ public class ISaleDao implements SaleDao {
     private static final String SQL_GET_SALE_BY_ID = String.format("SELECT %s,* FROM %s WHERE %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.rowid);
     private static final String SQL_GET_SALE_DETAIL_BY_SALE_ID = String.format("SELECT %s,* FROM %s WHERE %s=?", SalesDetailsTableField.rowid, Table.SALES_DETAILS, SalesDetailsTableField.sale_id);
     private static final String SQL_GET_SALE_BY_ID_AND_USER_ID = String.format("SELECT %s,* FROM %s WHERE %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.rowid);
-    //Not filtered
-    private static final String SQL_GET_ALL_SALES_BY_USER_ID = String.format("SELECT %s,* FROM %s WHERE %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id);
-    private static final String SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE = String.format("SELECT %s,* FROM %s WHERE %s=? AND (%s BETWEEN ? AND ?)", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.sale_date);
-    private static final String SQL_GET_ALL_SALES = String.format("SELECT %s,* FROM %s", SalesTableField.rowid, Table.SALES);
-    private static final String SQL_GET_SALES_IN_DATE_RANGE = String.format("SELECT %s,* FROM %s WHERE %s BETWEEN ? AND ?", SalesTableField.rowid, Table.SALES, SalesTableField.sale_date);
-    //Filtered - Credit All
-    private static final String SQL_GET_ALL_SALES_BY_USER_ID_CREDIT = String.format("SELECT %s,* FROM %s WHERE %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.type);
-    private static final String SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CREDIT = String.format("SELECT %s,* FROM %s WHERE %s=? AND (%s BETWEEN ? AND ?) AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.sale_date, SalesTableField.type);
-    private static final String SQL_GET_ALL_SALES_CREDIT = String.format("SELECT %s,* FROM %s WHERE %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.type);
-    private static final String SQL_GET_SALES_IN_DATE_RANGE_CREDIT = String.format("SELECT %s,* FROM %s WHERE (%s BETWEEN ? AND ?) AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.sale_date, SalesTableField.type);
-    //Filtered Credit Paid
-    private static final String SQL_GET_ALL_SALES_BY_USER_ID_CREDIT_PAID = String.format("SELECT %s,* FROM %s WHERE %s=? AND %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.type, SalesTableField.state);
-    private static final String SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CREDIT_PAID = String.format("SELECT %s,* FROM %s WHERE %s=? AND (%s BETWEEN ? AND ?) AND %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.sale_date, SalesTableField.type, SalesTableField.state);
-    private static final String SQL_GET_ALL_SALES_CREDIT_PAID = String.format("SELECT %s,* FROM %s WHERE %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.type, SalesTableField.state);
-    private static final String SQL_GET_SALES_IN_DATE_RANGE_CREDIT_PAID = String.format("SELECT %s,* FROM %s WHERE (%s BETWEEN ? AND ?) AND %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.sale_date, SalesTableField.type, SalesTableField.state);
-    //Filtered Credit Not Paid
-    private static final String SQL_GET_ALL_SALES_BY_USER_ID_CREDIT_NOT_PAID = String.format("SELECT %s,* FROM %s WHERE %s=? AND %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.type, SalesTableField.state);
-    private static final String SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CREDIT_NOT_PAID = String.format("SELECT %s,* FROM %s WHERE %s=? AND (%s BETWEEN ? AND ?) AND %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.sale_date, SalesTableField.type, SalesTableField.state);
-    private static final String SQL_GET_ALL_SALES_CREDIT_NOT_PAID = String.format("SELECT %s,* FROM %s WHERE %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.type, SalesTableField.state);
-    private static final String SQL_GET_SALES_IN_DATE_RANGE_CREDIT_NOT_PAID = String.format("SELECT %s,* FROM %s WHERE (%s BETWEEN ? AND ?) AND %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.sale_date, SalesTableField.type, SalesTableField.state);
-    //Filtered Cash All
-    private static final String SQL_GET_ALL_SALES_BY_USER_ID_CASH = String.format("SELECT %s,* FROM %s WHERE %s=? AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.type);
-    private static final String SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CASH = String.format("SELECT %s,* FROM %s WHERE %s=? AND (%s BETWEEN ? AND ?) AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.sale_date, SalesTableField.type);
-    private static final String SQL_GET_ALL_SALES_CASH = String.format("SELECT %s,* FROM %s WHERE %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.type);
-    private static final String SQL_GET_SALES_IN_DATE_RANGE_CASH = String.format("SELECT %s,* FROM %s WHERE (%s BETWEEN ? AND ?) AND %s=?", SalesTableField.rowid, Table.SALES, SalesTableField.sale_date, SalesTableField.type);
+    private static final String SQL_DELETE_SALE_BY_ID = String.format("DELETE FROM %s WHERE %s=?", Table.SALES, SalesTableField.rowid);
+    private static final String SQL_DELETE_SALE_DETAILS_BY_SALE_ID = String.format("DELETE FROM %s WHERE %s=?", Table.SALES_DETAILS, SalesDetailsTableField.sale_id);
+    private static final String SQL_DELETE_BONUSES_BY_SALE_ID = String.format("DELETE FROM %s WHERE %s=?", Table.BONUSES, BonusesTableField.sale_id);
+    private static final String SQL_DELETE_INCOME_BY_SALE_ID = String.format("DELETE FROM %s WHERE %s=?", Table.INCOMES, IncomesTableField.sale_id);
+    
+    private static final String SQL_GET_ALL_SALES_BY_USER_ID = String.format("SELECT %s,* FROM %s WHERE %s=? AND (\"%s\" LIKE ?) AND (\"%s\" LIKE ?)", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.state, SalesTableField.type);
+    private static final String SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE = String.format("SELECT %s,* FROM %s WHERE %s=? AND (%s BETWEEN ? AND ?) AND (\"%s\" LIKE ?) AND (\"%s\" LIKE ?)", SalesTableField.rowid, Table.SALES, SalesTableField.buyer_id, SalesTableField.sale_date, SalesTableField.state, SalesTableField.type);
+    private static final String SQL_GET_ALL_SALES = String.format("SELECT %s,* FROM %s WHERE (\"%s\" LIKE ?) AND (\"%s\" LIKE ?)", SalesTableField.rowid, Table.SALES, SalesTableField.state, SalesTableField.type);
+    private static final String SQL_GET_SALES_IN_DATE_RANGE = String.format("SELECT %s,* FROM %s WHERE (%s BETWEEN ? AND ?) AND (\"%s\" LIKE ?) AND (\"%s\" LIKE ?)", SalesTableField.rowid, Table.SALES, SalesTableField.sale_date, SalesTableField.state, SalesTableField.type);
 
     @Override
     public Long addSale(Sale sale, ArrayList<Sale.Detail> details) {
@@ -178,7 +163,7 @@ public class ISaleDao implements SaleDao {
     }
 
     @Override
-    public ArrayList<Sale> getAllSalesByUserId(Long id) {
+    public ArrayList<Sale> getAllSalesByUserId(Long id, String state, String type) {
         Connection conn = DatabaseConfig.getConnection();
         if (conn == null) {
             JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserId(): No se pudo establecer conexión con la base de datos.");
@@ -186,6 +171,8 @@ public class ISaleDao implements SaleDao {
         }
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_BY_USER_ID)) {
             pstmt.setLong(1, id);
+            pstmt.setString(2, state);
+            pstmt.setString(3, type);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<Sale> sales = new ArrayList<>();
             while (rs.next()) {
@@ -206,13 +193,15 @@ public class ISaleDao implements SaleDao {
     }
 
     @Override
-    public ArrayList<Sale> getAllSales() {
+    public ArrayList<Sale> getAllSales(String state, String type) {
         Connection conn = DatabaseConfig.getConnection();
         if (conn == null) {
             JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSales(): No se pudo establecer conexión con la base de datos.");
             return null;
         }
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES)) {
+            pstmt.setString(1, state);
+            pstmt.setString(2, type);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<Sale> sales = new ArrayList<>();
             while (rs.next()) {
@@ -233,7 +222,7 @@ public class ISaleDao implements SaleDao {
     }
 
     @Override
-    public ArrayList<Sale> getSalesInDateRange(Date d1, Date d2) {
+    public ArrayList<Sale> getSalesInDateRange(Date d1, Date d2, String state, String type) {
         Connection conn = DatabaseConfig.getConnection();
         if (conn == null) {
             JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRange(): No se pudo establecer conexión con la base de datos.");
@@ -242,6 +231,8 @@ public class ISaleDao implements SaleDao {
         try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_IN_DATE_RANGE)) {
             pstmt.setLong(1, d1.getTime());
             pstmt.setLong(2, d2.getTime());
+            pstmt.setString(3, state);
+            pstmt.setString(4, type);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<Sale> sales = new ArrayList<>();
             while (rs.next()) {
@@ -262,7 +253,7 @@ public class ISaleDao implements SaleDao {
     }
 
     @Override
-    public ArrayList<Sale> getSalesInDateRangeByUserId(Long id, Date d1, Date d2) {
+    public ArrayList<Sale> getSalesInDateRangeByUserId(Long id, Date d1, Date d2, String state, String type) {
         Connection conn = DatabaseConfig.getConnection();
         if (conn == null) {
             JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserId(): No se pudo establecer conexión con la base de datos.");
@@ -272,6 +263,8 @@ public class ISaleDao implements SaleDao {
             pstmt.setLong(1, id);
             pstmt.setLong(2, d1.getTime());
             pstmt.setLong(3, d2.getTime());
+            pstmt.setString(4, state);
+            pstmt.setString(5, type);
             ResultSet rs = pstmt.executeQuery();
             ArrayList<Sale> sales = new ArrayList<>();
             while (rs.next()) {
@@ -319,491 +312,6 @@ public class ISaleDao implements SaleDao {
         return null;
     }
     
-    
-    //Filtered Credit
-    @Override
-    public ArrayList<Sale> getAllSalesByUserIdCredit(Long id) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCredit(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_BY_USER_ID_CREDIT)) {
-            pstmt.setLong(1, id);
-            pstmt.setString(2, SaleType.CREDITO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCredit(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getAllSalesCredit() {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCredit(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_CREDIT)) {
-            pstmt.setString(1, SaleType.CREDITO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCredit(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeCredit(Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCredit(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_IN_DATE_RANGE_CREDIT)) {
-            pstmt.setLong(1, d1.getTime());
-            pstmt.setLong(2, d2.getTime());
-            pstmt.setString(3, SaleType.CREDITO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCredit(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeByUserIdCredit(Long id, Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCredit(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CREDIT)) {
-            pstmt.setLong(1, id);
-            pstmt.setLong(2, d1.getTime());
-            pstmt.setLong(3, d2.getTime());
-            pstmt.setString(4, SaleType.CREDITO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCredit(): " + ex.getMessage());
-        }
-        return null;
-    }
-    
-    //Filtered Credit Paid
-    @Override
-    public ArrayList<Sale> getAllSalesByUserIdCreditPaid(Long id) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCreditPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_BY_USER_ID_CREDIT_PAID)) {
-            pstmt.setLong(1, id);
-            pstmt.setString(2, SaleType.CREDITO.toString());
-            pstmt.setString(3, SaleState.PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCreditPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getAllSalesCreditPaid() {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCreditPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_CREDIT_PAID)) {
-            pstmt.setString(1, SaleType.CREDITO.toString());
-            pstmt.setString(2, SaleState.PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCreditPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeCreditPaid(Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCreditPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_IN_DATE_RANGE_CREDIT_PAID)) {
-            pstmt.setLong(1, d1.getTime());
-            pstmt.setLong(2, d2.getTime());
-            pstmt.setString(3, SaleType.CREDITO.toString());
-            pstmt.setString(4, SaleState.PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCreditPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeByUserIdCreditPaid(Long id, Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCreditPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CREDIT_PAID)) {
-            pstmt.setLong(1, id);
-            pstmt.setLong(2, d1.getTime());
-            pstmt.setLong(3, d2.getTime());
-            pstmt.setString(4, SaleType.CREDITO.toString());
-            pstmt.setString(5, SaleState.PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCreditPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-    
-    //Filtered Credit Not Paid
-    @Override
-    public ArrayList<Sale> getAllSalesByUserIdCreditNotPaid(Long id) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCreditNotPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_BY_USER_ID_CREDIT_NOT_PAID)) {
-            pstmt.setLong(1, id);
-            pstmt.setString(2, SaleType.CREDITO.toString());
-            pstmt.setString(3, SaleState.NO_PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCreditNotPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getAllSalesCreditNotPaid() {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCreditNotPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_CREDIT_NOT_PAID)) {
-            pstmt.setString(1, SaleType.CREDITO.toString());
-            pstmt.setString(2, SaleState.NO_PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCreditNotPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeCreditNotPaid(Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCreditNotPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_IN_DATE_RANGE_CREDIT_NOT_PAID)) {
-            pstmt.setLong(1, d1.getTime());
-            pstmt.setLong(2, d2.getTime());
-            pstmt.setString(3, SaleType.CREDITO.toString());
-            pstmt.setString(4, SaleState.NO_PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCreditNotPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeByUserIdCreditNotPaid(Long id, Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCreditNotPaid(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CREDIT_NOT_PAID)) {
-            pstmt.setLong(1, id);
-            pstmt.setLong(2, d1.getTime());
-            pstmt.setLong(3, d2.getTime());
-            pstmt.setString(4, SaleType.CREDITO.toString());
-            pstmt.setString(5, SaleState.NO_PAGADA.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCreditNotPaid(): " + ex.getMessage());
-        }
-        return null;
-    }
-    
-    //Filtered Cash
-    @Override
-    public ArrayList<Sale> getAllSalesByUserIdCash(Long id) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCash(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_BY_USER_ID_CASH)) {
-            pstmt.setLong(1, id);
-            pstmt.setString(2, SaleType.CONTADO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesByUserIdCash(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getAllSalesCash() {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCash(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SALES_CASH)) {
-            pstmt.setString(1, SaleType.CONTADO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSalesCash(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeCash(Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCash(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_IN_DATE_RANGE_CASH)) {
-            pstmt.setLong(1, d1.getTime());
-            pstmt.setLong(2, d2.getTime());
-            pstmt.setString(3, SaleType.CONTADO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeCash(): " + ex.getMessage());
-        }
-        return null;
-    }
-
-    @Override
-    public ArrayList<Sale> getSalesInDateRangeByUserIdCash(Long id, Date d1, Date d2) {
-        Connection conn = DatabaseConfig.getConnection();
-        if (conn == null) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCash(): No se pudo establecer conexión con la base de datos.");
-            return null;
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SALES_BY_USER_ID_IN_DATE_RANGE_CASH)) {
-            pstmt.setLong(1, id);
-            pstmt.setLong(2, d1.getTime());
-            pstmt.setLong(3, d2.getTime());
-            pstmt.setString(4, SaleType.CONTADO.toString());
-            ResultSet rs = pstmt.executeQuery();
-            ArrayList<Sale> sales = new ArrayList<>();
-            while (rs.next()) {
-                Sale s = new Sale();
-                s.setId(rs.getLong(SalesTableField.rowid.toString()));
-                s.setSaleDate(rs.getLong(SalesTableField.sale_date.toString()));
-                s.setBuyerId(rs.getLong(SalesTableField.buyer_id.toString()));
-                s.setTotal(rs.getDouble(SalesTableField.total.toString()));
-                s.setState(rs.getString(SalesTableField.state.toString()));
-                s.setType(rs.getString(SalesTableField.type.toString()));
-                sales.add(s);
-            }
-            return sales;
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSalesInDateRangeByUserIdCash(): " + ex.getMessage());
-        }
-        return null;
-    }
-
     @Override
     public boolean updateSaleState(Long id, SaleState state) {
         Connection conn = DatabaseConfig.getConnection();
@@ -818,6 +326,74 @@ public class ISaleDao implements SaleDao {
             return true;
         }catch(SQLException ex){
             JOptionPane.showMessageDialog(null, this.getClass().getName()+"::updateSaleState(): "+ex.getMessage());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeSale(Long id) {
+        Connection conn = DatabaseConfig.getConnection();
+        if (conn == null) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeSale(): No se pudo establecer conexión con la base de datos.");
+            return false;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_SALE_BY_ID)) {
+            pstmt.setLong(1, id);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeSale(): " + ex.getMessage());
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean removeSaleDetailsBySaleId(Long id) {
+        Connection conn = DatabaseConfig.getConnection();
+        if (conn == null) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeSaleDetails(): No se pudo establecer conexión con la base de datos.");
+            return false;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_SALE_DETAILS_BY_SALE_ID)) {
+            pstmt.setLong(1, id);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeSaleDetails(): " + ex.getMessage());
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean removeBonusesBySaleId(Long id) {
+        Connection conn = DatabaseConfig.getConnection();
+        if (conn == null) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeBonusesBySaleId(): No se pudo establecer conexión con la base de datos.");
+            return false;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_BONUSES_BY_SALE_ID)) {
+            pstmt.setLong(1, id);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeBonusesBySaleId(): " + ex.getMessage());
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean removeIncomeBySaleId(Long id) {
+        Connection conn = DatabaseConfig.getConnection();
+        if (conn == null) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeIncomeBySaleId(): No se pudo establecer conexión con la base de datos.");
+            return false;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_DELETE_INCOME_BY_SALE_ID)) {
+            pstmt.setLong(1, id);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeIncomeBySaleId(): " + ex.getMessage());
         }
         return false;
     }

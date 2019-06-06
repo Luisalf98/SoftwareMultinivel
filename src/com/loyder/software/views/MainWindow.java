@@ -47,7 +47,7 @@ public class MainWindow extends javax.swing.JFrame {
         this.categoriesView = new CategoriesView(this.usersView);
         this.percentagesView = new PercentagesView();
         
-        this.saleInfoView = new SaleInfoView(this.salesPanel);
+        this.saleInfoView = new SaleInfoView(this.salesPanel, this.salesView);
         this.userInfoView = new UserInfoView(this.usersPanel);
         this.userPurchasesView = new UserPurchasesView(this.usersPanel, this.salesPanel, this.saleInfoView, this.jTabbedPane1);
         

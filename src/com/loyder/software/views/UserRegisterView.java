@@ -136,7 +136,7 @@ public class UserRegisterView extends javax.swing.JPanel {
 
         topBarPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        goBackButton.setText("Cancelar");
+        goBackButton.setText("Atrás");
         topBarPanel.add(goBackButton);
 
         add(topBarPanel, java.awt.BorderLayout.PAGE_START);

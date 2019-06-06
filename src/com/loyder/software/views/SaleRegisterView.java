@@ -10,6 +10,7 @@ import com.loyder.software.model.dao.config.DatabaseConfig.SaleState;
 import com.loyder.software.model.dao.config.DatabaseConfig.SaleType;
 import com.loyder.software.model.dao.config.DatabaseConnection;
 import com.loyder.software.model.entities.Bonus;
+import com.loyder.software.model.entities.Income;
 import com.loyder.software.model.entities.Percentage;
 import com.loyder.software.model.entities.Product;
 import com.loyder.software.model.entities.Sale;
@@ -17,6 +18,7 @@ import com.loyder.software.model.entities.User;
 import java.awt.CardLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -173,7 +175,7 @@ public class SaleRegisterView extends javax.swing.JPanel {
 
         panelTopBar.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        buttonGoBack.setText("Cancelar");
+        buttonGoBack.setText("Atrás");
         panelTopBar.add(buttonGoBack);
 
         add(panelTopBar, java.awt.BorderLayout.NORTH);
@@ -704,8 +706,9 @@ public class SaleRegisterView extends javax.swing.JPanel {
         this.textFieldProductQuantity.setValue(null);
 
         Long productId = (Long) tableProducts.getValueAt(tableProducts.getSelectedRow(), 0);
-        String name = (String) tableProducts.getValueAt(tableProducts.getSelectedRow(), 1);
-        Double price = (Double) tableProducts.getValueAt(tableProducts.getSelectedRow(), 3);
+        Product p = DatabaseConnection.getProductDao().getProductById(productId);
+        String name = p.getName();
+        Double price = p.getPrice();
         Double total = quantity * price;
         tableProductsBillModel.addRow(new Object[]{
             productId, name, ApplicationStarter.CURRENCY_FORMAT.format(price), quantity, 
@@ -713,7 +716,7 @@ public class SaleRegisterView extends javax.swing.JPanel {
         });
 
         this.saleTotal += total;
-        this.labelSaleTotalValue.setText(this.saleTotal.toString());
+        this.labelSaleTotalValue.setText(ApplicationStarter.CURRENCY_FORMAT.format(this.saleTotal));
     }//GEN-LAST:event_addProductToBillActionPerformed
 
     private void deleteProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteProductActionPerformed
@@ -723,10 +726,12 @@ public class SaleRegisterView extends javax.swing.JPanel {
             return;
         }
 
-        Double total = (Double) this.tableProductsBillModel.getValueAt(tableProductsBill.getSelectedRow(), 4);
+        Long productId = (Long) tableProductsBill.getValueAt(tableProductsBill.getSelectedRow(), 0);
+        Long quantity = (Long) tableProductsBill.getValueAt(tableProductsBill.getSelectedRow(), 3);
+        Product p = DatabaseConnection.getProductDao().getProductById(productId);
         tableProductsBillModel.removeRow(tableProductsBill.getSelectedRow());
-        this.saleTotal -= total;
-        this.labelSaleTotalValue.setText(this.saleTotal.toString());
+        this.saleTotal -= quantity*p.getPrice();
+        this.labelSaleTotalValue.setText(ApplicationStarter.CURRENCY_FORMAT.format(this.saleTotal));
     }//GEN-LAST:event_deleteProductActionPerformed
 
     private void submitSaleBillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_submitSaleBillActionPerformed
@@ -764,34 +769,54 @@ public class SaleRegisterView extends javax.swing.JPanel {
         Long saleId = DatabaseConnection.getSaleDao().addSale(sale, details);
         if (!saleId.equals(-1L)) {
             JOptionPane.showMessageDialog(null, "Registro de venta exitoso!");
-            User buyer = DatabaseConnection.getUserDao().getUserById(buyerId);
-            User adder = DatabaseConnection.getUserDao().getUserById(buyer.getAdderId());
-            ArrayList<Percentage> percentages = DatabaseConnection.getPercentageDao().getAllPercentages();
-            System.out.println(percentages);
-            percentages.sort((Percentage p1, Percentage p2) -> {
-                if (p1.getId() > p2.getId()) {
-                    return 1;
-                } else if (p1.getId() < p2.getId()) {
-                    return -1;
-                }
-                return 0;
-            });
-            System.out.println(percentages);
-            for (int i = 0; i < percentages.size() && !adder.getId().equals(-1L); i++) {
-                Bonus b = new Bonus(null, percentages.get(i).getId(), saleId, this.saleTotal * percentages.get(i).getPercentage() / 100, adder.getId(), System.currentTimeMillis());
-                if (!DatabaseConnection.getBonusDao().addBonus(b)) {
-                    JOptionPane.showMessageDialog(null, "Error al registrar bonificacion!");
+            if(state.toString().equals(SaleState.PAGADA.toString())){
+                User buyer = DatabaseConnection.getUserDao().getUserById(buyerId);
+                User adder;
+                if(buyer.getAdderId().equals(-1L)){
+                    adder = ApplicationStarter.COMPANY_ROOT;
+                }else{
+                    adder = DatabaseConnection.getUserDao().getUserById(buyer.getAdderId());
                 }
                 
-                if (adder.getAdderId().equals(-1L)) {
-                    adder = ApplicationStarter.COMPANY_ROOT;
-                } else {
-                    adder = DatabaseConnection.getUserDao().getUserById(adder.getAdderId());
-                }
+                ArrayList<Percentage> percentages = DatabaseConnection.getPercentageDao().getAllPercentages();
+                System.out.println(percentages);
+                percentages.sort((Percentage p1, Percentage p2) -> {
+                    if (p1.getId() > p2.getId()) {
+                        return 1;
+                    } else if (p1.getId() < p2.getId()) {
+                        return -1;
+                    }
+                    return 0;
+                });
+                System.out.println(percentages);
+                Double totalBonuses = 0D, bonus = 0D;
+                for (int i = 0; i < percentages.size() && !adder.getId().equals(-1L); i++) {
+                    bonus = this.saleTotal * percentages.get(i).getPercentage();
+                    Bonus b = new Bonus(null, percentages.get(i).getId(), saleId, bonus, adder.getId(), System.currentTimeMillis());
+                    if (!DatabaseConnection.getBonusDao().addBonus(b)) {
+                        JOptionPane.showMessageDialog(null, "Error al registrar bonificacion!");
+                        return;
+                    }
+                    totalBonuses += bonus;
+                    if (adder.getAdderId().equals(-1L)) {
+                        adder = ApplicationStarter.COMPANY_ROOT;
+                    } else {
+                        adder = DatabaseConnection.getUserDao().getUserById(adder.getAdderId());
+                    }
 
+                }
+                JOptionPane.showMessageDialog(null, "Se agregaron las bonificaciones!");
+                
+                Income income = new Income(null, saleId, System.currentTimeMillis(), saleTotal, totalBonuses, saleTotal-totalBonuses);
+                if(!DatabaseConnection.getIncomeDao().addIncome(income)){
+                    JOptionPane.showMessageDialog(null, "Error al registrar ingreso!");
+                    return;
+                }
+                JOptionPane.showMessageDialog(null, "Se agregó el ingreso!");
             }
         } else {
             JOptionPane.showMessageDialog(null, "No se pudo registrar la venta!");
+            return;
         }
         this.tableCustomersModel.setDataVector(EMPTY_TABLE, TABLE_CUSTOMERS_HEADER);
         this.tableProductsModel.setDataVector(EMPTY_TABLE, TABLE_PRODUCTS_HEADER);

@@ -168,7 +168,7 @@ public class UserPurchasesView extends JPanel{
         date2TextField.setText("");
         date2TextField.setValue(null);
 
-        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getSalesInDateRangeByUserId(infoCustomerId, d1, d2);
+        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getSalesInDateRangeByUserId(infoCustomerId, d1, d2, "%", "%");
         this.purchasesTableModel.setDataVector(EMPTY_TABLE, PURCHASES_HEADER);
 
         if (sales != null && !sales.isEmpty()) {
@@ -186,7 +186,7 @@ public class UserPurchasesView extends JPanel{
     
     public void showAllPurchases(){
 
-        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getAllSalesByUserId(infoCustomerId);
+        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getAllSalesByUserId(infoCustomerId, "%", "%");
         this.purchasesTableModel.setDataVector(EMPTY_TABLE, PURCHASES_HEADER);
 
         if (sales != null && !sales.isEmpty()) {
