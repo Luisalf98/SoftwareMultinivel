@@ -1,0 +1,10 @@
+SwingPrinter$FilePageSetupAction
+SwingPrinter
+com.loyder.software.main.ComponentPrintable
+SwingPrinter$1
+SwingPrinter$FileQuitAction
+com.loyder.software.main.SwingPrinter
+com.loyder.software.main.PatchworkComponent
+SwingPrinter$FilePrintAction
+PatchworkComponent
+ComponentPrintable

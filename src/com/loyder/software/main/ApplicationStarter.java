@@ -8,6 +8,7 @@ package com.loyder.software.main;
 import com.loyder.software.model.dao.config.DatabaseConfig;
 import com.loyder.software.model.entities.User;
 import com.loyder.software.views.MainWindow;
+import java.io.File;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,14 +38,21 @@ public class ApplicationStarter {
     public static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance(LOCALE);
     public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(LOCALE);
     
+    public static final String APPLICATION_DIR = System.getenv().get("LOCALAPPDATA")+"\\SoftwareMultinivel";
+    
     static{
         PERCENTAGE_FORMAT.setMinimumFractionDigits(0);
         PERCENTAGE_FORMAT.setMaximumFractionDigits(2);
         NUMBER_FORMAT.setMaximumFractionDigits(2);
         NUMBER_FORMAT.setMinimumFractionDigits(0);
+        
     }
     
     public static void main(String[] args) {
+        File f = new File(APPLICATION_DIR);
+        if(!f.exists())
+            f.mkdir();
+        
         try {
             // TODO code application logic here
             boolean laf = false;

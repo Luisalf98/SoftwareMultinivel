@@ -5,6 +5,7 @@
  */
 package com.loyder.software.model.dao.config;
 
+import com.loyder.software.main.ApplicationStarter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -366,7 +367,7 @@ public class DatabaseConfig {
     }
 
     private static Connection conn = null;
-    private static final String DATABASE_PATH = System.getProperty("user.dir") + "/test.db";
+    private static final String DATABASE_PATH = ApplicationStarter.APPLICATION_DIR + "\\database.db";
     private static final String URL_CONNECTION = "jdbc:sqlite:" + DATABASE_PATH;
 
     public static Connection getConnection() {
