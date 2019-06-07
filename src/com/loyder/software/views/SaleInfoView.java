@@ -21,6 +21,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.BorderFactory;
@@ -78,8 +80,10 @@ public class SaleInfoView extends JPanel {
     private JPanel topBarPanel;
     private JPanel goBackPanel;
     private JPanel changeSaleStatusPanel;
+    private JPanel genBillPanel;
     private JButton goBackButton;
     private JButton changeSaleStatusButton;
+    private JButton genBillButton;
     private JComboBox changeSaleStatusComboBox;
     private DefaultComboBoxModel changeSaleStatusComboBoxModel;
 
@@ -90,13 +94,15 @@ public class SaleInfoView extends JPanel {
 
     private final JPanel panelParent;
     private final SalesView salesView;
+    private final PrintBillView printBillView;
 
     private Long dataSaleId;
 
-    public SaleInfoView(JPanel panelParent1, SalesView salesView1) {
+    public SaleInfoView(JPanel panelParent1, SalesView salesView1, PrintBillView printBillView1) {
         initComponents();
         this.panelParent = panelParent1;
         this.salesView = salesView1;
+        this.printBillView = printBillView1;
 
         this.changeSaleStatusComboBox.setSelectedIndex(-1);
 
@@ -122,6 +128,13 @@ public class SaleInfoView extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 ((CardLayout) panelParent.getLayout()).show(panelParent, SalesView.class.getName());
+            }
+        });
+        this.genBillButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                ((CardLayout) panelParent.getLayout()).show(panelParent, PrintBillView.class.getName());
+                printBillView.setData(dataSaleId);
             }
         });
     }
@@ -344,14 +357,21 @@ public class SaleInfoView extends JPanel {
         this.dividerPanel.add(this.bonusesTableScroll);
 
         this.goBackButton = new JButton("Atrás");
+        
+        this.genBillButton = new JButton("Generar Factura");
 
         this.topBarPanel = new JPanel(new GridLayout(1, 2));
         this.goBackPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         this.changeSaleStatusPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        this.genBillPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        
+        JPanel p = new JPanel(new GridLayout(1,2));
+        p.add(this.goBackPanel);
+        p.add(this.genBillPanel);
 
         this.goBackPanel.add(this.goBackButton);
 
-        this.topBarPanel.add(this.goBackPanel);
+        this.topBarPanel.add(p);
         this.topBarPanel.add(this.changeSaleStatusPanel);
 
         this.changeSaleStatusComboBoxModel = new DefaultComboBoxModel(new Object[]{SaleState.PAGADA, SaleState.NO_PAGADA, SaleState.SOLICITADA, SaleState.ELIMINADA});
@@ -360,7 +380,9 @@ public class SaleInfoView extends JPanel {
 
         this.changeSaleStatusPanel.add(this.changeSaleStatusComboBox);
         this.changeSaleStatusPanel.add(this.changeSaleStatusButton);
-
+        
+        this.genBillPanel.add(this.genBillButton);
+        
         this.add(this.dividerPanel, BorderLayout.CENTER);
         this.add(this.topBarPanel, BorderLayout.NORTH);
     }

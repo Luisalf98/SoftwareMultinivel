@@ -34,6 +34,8 @@ public class MainWindow extends javax.swing.JFrame {
     private final UserRegisterView registerUserView;
     private final SaleRegisterView registerSaleView;
     
+    private final PrintBillView printBillView;
+    
     private final MultiLevelNetworkDrawer multiLevelNetworkDrawer;
     
     public MainWindow() throws ParseException {
@@ -47,7 +49,9 @@ public class MainWindow extends javax.swing.JFrame {
         this.categoriesView = new CategoriesView(this.usersView);
         this.percentagesView = new PercentagesView();
         
-        this.saleInfoView = new SaleInfoView(this.salesPanel, this.salesView);
+        this.printBillView = new PrintBillView(this.salesPanel);
+        
+        this.saleInfoView = new SaleInfoView(this.salesPanel, this.salesView, this.printBillView);
         this.userInfoView = new UserInfoView(this.usersPanel);
         this.userPurchasesView = new UserPurchasesView(this.usersPanel, this.salesPanel, this.saleInfoView, this.jTabbedPane1);
         
@@ -55,6 +59,7 @@ public class MainWindow extends javax.swing.JFrame {
         this.registerSaleView = new SaleRegisterView(this.salesPanel);
         
         this.multiLevelNetworkDrawer = new MultiLevelNetworkDrawer(this.usersPanel);
+        
         
         this.incomesPanel.add(this.incomesView);
         
@@ -67,6 +72,7 @@ public class MainWindow extends javax.swing.JFrame {
         this.salesPanel.add(this.salesView, SalesView.class.getName());
         this.salesPanel.add(this.saleInfoView, SaleInfoView.class.getName());
         this.salesPanel.add(this.registerSaleView, SaleRegisterView.class.getName());
+        this.salesPanel.add(this.printBillView, PrintBillView.class.getName());
         
         this.percentagesPanel.add(this.percentagesView);
         
