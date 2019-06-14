@@ -9,6 +9,7 @@ import com.loyder.software.model.dao.SaleDao;
 import com.loyder.software.model.dao.config.DatabaseConfig;
 import com.loyder.software.model.dao.config.DatabaseConfig.BonusesTableField;
 import com.loyder.software.model.dao.config.DatabaseConfig.IncomesTableField;
+import com.loyder.software.model.dao.config.DatabaseConfig.ProductsTableField;
 import com.loyder.software.model.dao.config.DatabaseConfig.SaleState;
 import com.loyder.software.model.dao.config.DatabaseConfig.SalesDetailsTableField;
 import com.loyder.software.model.dao.config.DatabaseConfig.SalesTableField;
@@ -57,6 +58,10 @@ public class ISaleDao implements SaleDao {
     private static final String SQL_GET_ALL_SALES = String.format("SELECT %s,* FROM %s WHERE (\"%s\" LIKE ?) AND (\"%s\" LIKE ?)", SalesTableField.rowid, Table.SALES, SalesTableField.state, SalesTableField.type);
     private static final String SQL_GET_SALES_IN_DATE_RANGE = String.format("SELECT %s,* FROM %s WHERE (%s BETWEEN ? AND ?) AND (\"%s\" LIKE ?) AND (\"%s\" LIKE ?)", SalesTableField.rowid, Table.SALES, SalesTableField.sale_date, SalesTableField.state, SalesTableField.type);
 
+    private static final String SQL_GET_ALL_SOLD_PRODUCTS = String.format("SELECT SUM(s.%s) as product_quantity, s.%s as product_id, p.\"%s\" as product_name, p.%s as product_price FROM %s s, %s p, %s sa WHERE s.%s == p.%s AND s.%s = sa.%s AND sa.%s = '%s' GROUP BY s.%s", SalesDetailsTableField.quantity, SalesDetailsTableField.product_id, ProductsTableField.name, ProductsTableField.price, Table.SALES_DETAILS, Table.PRODUCTS, Table.SALES, SalesDetailsTableField.product_id, ProductsTableField.rowid, SalesDetailsTableField.sale_id, SalesTableField.rowid, SalesTableField.state, SaleState.PAGADA, SalesDetailsTableField.product_id);
+    private static final String SQL_GET_SOLD_PRODUCT_BY_ID = String.format("SELECT SUM(s.%s) as product_quantity, s.%s as product_id, p.\"%s\" as product_name, p.%s as product_price FROM %s s, %s p, %s sa WHERE s.%s == p.%s AND s.%s = ? AND s.%s = sa.%s AND sa.%s = '%s' GROUP BY s.%s", SalesDetailsTableField.quantity, SalesDetailsTableField.product_id, ProductsTableField.name, ProductsTableField.price,Table.SALES_DETAILS, Table.PRODUCTS, Table.SALES, SalesDetailsTableField.product_id, ProductsTableField.rowid, SalesDetailsTableField.product_id, SalesDetailsTableField.sale_id, SalesTableField.rowid, SalesTableField.state, SaleState.PAGADA, SalesDetailsTableField.product_id);
+    private static final String SQL_GET_ALL_SOLD_PRODUCTS_IN_DATE_RANGE = String.format("SELECT SUM(s.%s) as product_quantity, s.%s as product_id, p.\"%s\" as product_name, p.%s as product_price FROM %s s, %s p, %s sa WHERE s.%s == p.%s  AND sa.%s == s.%s AND (sa.%s BETWEEN ? AND ?) AND sa.%s = '%s' GROUP BY s.%s", SalesDetailsTableField.quantity, SalesDetailsTableField.product_id, ProductsTableField.name, ProductsTableField.price, Table.SALES_DETAILS, Table.PRODUCTS, Table.SALES, SalesDetailsTableField.product_id, ProductsTableField.rowid, SalesTableField.rowid, SalesDetailsTableField.sale_id, SalesTableField.sale_date, SalesTableField.state, SaleState.PAGADA, SalesDetailsTableField.product_id);
+    
     @Override
     public Long addSale(Sale sale, ArrayList<Sale.Detail> details) {
         Connection conn = DatabaseConfig.getConnection();
@@ -396,6 +401,84 @@ public class ISaleDao implements SaleDao {
             JOptionPane.showMessageDialog(null, ISaleDao.class.getName() + "::removeIncomeBySaleId(): " + ex.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public ArrayList<Sale.SoldProduct> getAllSoldProducts() {
+        Connection conn = DatabaseConfig.getConnection();
+        if (conn == null) {
+            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSoldProducts(): No se pudo establecer conexión con la base de datos.");
+            return null;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SOLD_PRODUCTS)) {
+            ResultSet rs = pstmt.executeQuery();
+            ArrayList<Sale.SoldProduct> sales = new ArrayList<>();
+            while (rs.next()) {
+                Sale.SoldProduct s = new Sale.SoldProduct();
+                s.setProductId(rs.getLong("product_id"));
+                s.setPrice(rs.getDouble("product_price"));
+                s.setProductName(rs.getString("product_name"));
+                s.setQuantity(rs.getLong("product_quantity"));
+                sales.add(s);
+            }
+            return sales;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSoldProducts(): " + ex.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public ArrayList<Sale.SoldProduct> getAllSoldProductsInDateRange(Long d1, Long d2) {
+        Connection conn = DatabaseConfig.getConnection();
+        if (conn == null) {
+            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSoldProductsInDateRange(): No se pudo establecer conexión con la base de datos.");
+            return null;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_ALL_SOLD_PRODUCTS_IN_DATE_RANGE)) {
+            pstmt.setLong(1, d1);
+            pstmt.setLong(2, d2);
+            ResultSet rs = pstmt.executeQuery();
+            ArrayList<Sale.SoldProduct> sales = new ArrayList<>();
+            while (rs.next()) {
+                Sale.SoldProduct s = new Sale.SoldProduct();
+                s.setProductId(rs.getLong("product_id"));
+                s.setPrice(rs.getDouble("product_price"));
+                s.setProductName(rs.getString("product_name"));
+                s.setQuantity(rs.getLong("product_quantity"));
+                sales.add(s);
+            }
+            return sales;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getAllSoldProductsInDateRange(): " + ex.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public ArrayList<Sale.SoldProduct> getSoldProductById(Long id) {
+        Connection conn = DatabaseConfig.getConnection();
+        if (conn == null) {
+            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSoldProductById(): No se pudo establecer conexión con la base de datos.");
+            return null;
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(SQL_GET_SOLD_PRODUCT_BY_ID)) {
+            pstmt.setLong(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            ArrayList<Sale.SoldProduct> sales = new ArrayList<>();
+            while (rs.next()) {
+                Sale.SoldProduct s = new Sale.SoldProduct();
+                s.setProductId(rs.getLong("product_id"));
+                s.setPrice(rs.getDouble("product_price"));
+                s.setProductName(rs.getString("product_name"));
+                s.setQuantity(rs.getLong("product_quantity"));
+                sales.add(s);
+            }
+            return sales;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, this.getClass().getName() + "::getSoldProductById(): " + ex.getMessage());
+        }
+        return null;
     }
 
 }

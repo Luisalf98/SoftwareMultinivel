@@ -30,4 +30,8 @@ public interface SaleDao {
     public ArrayList<Sale> getSalesInDateRangeByUserId(Long userId, Date d1, Date d2, String stateWildcard, String typeWildcard);
     public ArrayList<Sale> getAllSales(String stateWildcard, String typeWildcard);
     public ArrayList<Sale> getSalesInDateRange(Date d1, Date d2, String stateWildcard, String typeWildcard);
+    
+    public ArrayList<Sale.SoldProduct> getAllSoldProducts();
+    public ArrayList<Sale.SoldProduct> getAllSoldProductsInDateRange(Long d1, Long d2);
+    public ArrayList<Sale.SoldProduct> getSoldProductById(Long id);
 }

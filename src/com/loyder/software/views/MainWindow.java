@@ -31,6 +31,8 @@ public class MainWindow extends javax.swing.JFrame {
     private final SaleInfoView saleInfoView;
     private final UserPurchasesView userPurchasesView;
     
+    private final SoldProductsView soldProductsView;
+    
     private final UserRegisterView registerUserView;
     private final SaleRegisterView registerSaleView;
     
@@ -63,6 +65,8 @@ public class MainWindow extends javax.swing.JFrame {
         
         this.incomesPanel.add(this.incomesView);
         
+        this.soldProductsView = new SoldProductsView(this.salesPanel);
+        
         this.usersPanel.add(this.usersView, UsersView.class.getName());
         this.usersPanel.add(this.userInfoView, UserInfoView.class.getName());
         this.usersPanel.add(this.registerUserView, UserRegisterView.class.getName());
@@ -73,6 +77,7 @@ public class MainWindow extends javax.swing.JFrame {
         this.salesPanel.add(this.saleInfoView, SaleInfoView.class.getName());
         this.salesPanel.add(this.registerSaleView, SaleRegisterView.class.getName());
         this.salesPanel.add(this.printBillView, PrintBillView.class.getName());
+        this.salesPanel.add(this.soldProductsView, SoldProductsView.class.getName());
         
         this.percentagesPanel.add(this.percentagesView);
         

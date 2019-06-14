@@ -41,7 +41,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author Redes
  */
-public class SalesView extends JPanel {
+public class SoldProductsView extends JPanel {
 
     private JTable table;
     private DefaultTableModel tableModel;
@@ -52,9 +52,7 @@ public class SalesView extends JPanel {
     private JPanel footer;
     private JPanel footerBoxLayout;
     private JPanel footerFlowLayoutTotalSales;
-    private JPanel footerFlowLayoutDetails;
-    private JPanel footerFlowLayoutNewSale;
-    private JPanel footerFlowLayoutSoldProductsButton;
+    private JPanel goBackPanel;
     private JLabel idSearchLabel;
     private JLabel dateSearchLabel;
     private JButton dateSearchButton;
@@ -67,80 +65,45 @@ public class SalesView extends JPanel {
 
     private JLabel totalSalesLabel;
     private JLabel totalSales;
-    private JButton seeDetailsButton;
-    private JButton addNewSaleButton;
-    private JButton soldProductsButton;
+    private JButton goBackButton;
 
-    private JLabel filters;
-    private JComboBox comboBoxTypes;
-    private JComboBox comboBoxStates;
-
-    private static final String[] TABLE_MODEL_IDENTIFIERS = {"Código Venta", "Estado", "Tipo", "Código Cliente", "Nombre Cliente", "Fecha",
-        "Total Venta"};
+    private static final String[] TABLE_MODEL_IDENTIFIERS = {"Código Producto", "Nombre Producto", "Unidades Vendidas", "Precio Unidad", "Total"};
     private static final String[][] EMPTY_TABLE = new String[0][0];
 
     private final JPanel panelParent;
 
-    private SaleInfoView saleInfoView;
-
-    public SalesView(JPanel panelParent1) throws ParseException {
+    public SoldProductsView(JPanel panelParent1) throws ParseException {
         initComponents();
         this.panelParent = panelParent1;
         dateSearchButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                saleSearchByDateRange(e);
+                soldProductSearchByDateRange(e);
             }
         });
         idSearchButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                saleSearchById(e);
+                soldProductSearchById(e);
             }
         });
         buttonShowAllSales.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showAllSales(e);
+                showAllSoldProducts(e);
             }
         });
 
-        this.addNewSaleButton.addMouseListener(new MouseAdapter() {
+        this.goBackButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ((CardLayout) panelParent.getLayout()).show(panelParent, SaleRegisterView.class.getName());
-            }
-        });
-        this.seeDetailsButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (table.getSelectedRow() != -1) {
-                    saleInfoView.setData((Long) table.getValueAt(table.getSelectedRow(), 0));
-                    ((CardLayout) panelParent.getLayout()).show(panelParent, SaleInfoView.class.getName());
-                } else {
-                    JOptionPane.showMessageDialog(null, "Debe seleccionar una venta.");
-                }
-
-            }
-        });
-        this.soldProductsButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                ((CardLayout) panelParent.getLayout()).show(panelParent, SoldProductsView.class.getName());
+                ((CardLayout) panelParent.getLayout()).show(panelParent, SalesView.class.getName());
             }
         });
 
     }
 
-    public SaleInfoView getSaleInfoView() {
-        return saleInfoView;
-    }
-
-    public void setSaleInfoView(SaleInfoView saleInfoView) {
-        this.saleInfoView = saleInfoView;
-    }
-
-    public void saleSearchById(MouseEvent e) {
+    public void soldProductSearchById(MouseEvent e) {
         Long id = (Long) idTextField.getValue();
         if (id == null) {
             JOptionPane.showMessageDialog(this, "Código digitado inválido.");
@@ -149,67 +112,22 @@ public class SalesView extends JPanel {
 
         idTextField.setText("");
         idTextField.setValue(null);
-
-        Sale sale = DatabaseConnection.getSaleDao().getSaleById(id);
-        tableModel.setDataVector(EMPTY_TABLE, TABLE_MODEL_IDENTIFIERS);
-
-        if (sale != null) {
-            User c = DatabaseConnection.getUserDao().getUserById(sale.getBuyerId());
-            tableModel.addRow(new Object[]{sale.getId(), sale.getState(), sale.getType(), c.getId(),
-                c.getName() + " " + c.getLastName(),
-                ApplicationStarter.formatDate(new Date(sale.getSaleDate())),
-                ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal())});
-            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(sale.getTotal()));
-        } else {
-            JOptionPane.showMessageDialog(this, "No se encontro el ingreso especificado.");
-            totalSales.setText("");
-        }
-
-    }
-
-    public void saleSearchByDateRange(MouseEvent e) {
-        Date date1 = ((Date) date1TextField.getValue());
-        Date date2 = ((Date) date2TextField.getValue());
-        if (date1 == null || date2 == null) {
-            JOptionPane.showMessageDialog(this, "Formato de fecha incorrecto.");
-            return;
-        }
-
-        String stateFilter;
-        String typeFilter;
-
-        if (this.comboBoxStates.getSelectedIndex() == -1 || ((String) this.comboBoxStates.getSelectedItem()).equals("NINGUNO")) {
-            stateFilter = "%";
-        } else {
-            stateFilter = ((String) this.comboBoxStates.getSelectedItem());
-        }
-
-        if (this.comboBoxStates.getSelectedIndex() == -1 || ((String) this.comboBoxStates.getSelectedItem()).equals("NINGUNO")) {
-            typeFilter = "%";
-        } else {
-            typeFilter = ((String) this.comboBoxTypes.getSelectedItem());
-        }
-
-        date1TextField.setValue(null);
-        date2TextField.setValue(null);
-        date1TextField.setText("");
-        date2TextField.setText("");
-
+        
         Double totalSalesSum = 0d;
-        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getSalesInDateRange(date1, date2, stateFilter, typeFilter);
+        ArrayList<Sale.SoldProduct> sales = DatabaseConnection.getSaleDao().getSoldProductById(id);
         Object[][] data = new Object[sales.size()][5];
         if (sales != null && !sales.isEmpty()) {
             for (int i = 0; i < sales.size(); i++) {
-                User c = DatabaseConnection.getUserDao().getUserById(sales.get(i).getBuyerId());
-                data[i][0] = sales.get(i).getId();
-                data[i][1] = sales.get(i).getState();
-                data[i][2] = sales.get(i).getType();
-                data[i][3] = c.getId();
-                data[i][4] = c.getName() + " " + c.getLastName();
-                data[i][5] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
-                data[i][6] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
+                
+                Double totalSold = sales.get(i).getQuantity()*sales.get(i).getPrice();
+                
+                data[i][0] = sales.get(i).getProductId();
+                data[i][1] = sales.get(i).getProductName();
+                data[i][2] = sales.get(i).getQuantity();
+                data[i][3] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getPrice());
+                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(totalSold);
 
-                totalSalesSum += sales.get(i).getTotal();
+                totalSalesSum += totalSold;
             }
 
             totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalSalesSum));
@@ -221,38 +139,62 @@ public class SalesView extends JPanel {
 
     }
 
-    public void showAllSales(MouseEvent e) {
+    public void soldProductSearchByDateRange(MouseEvent e) {
+        Date date1 = ((Date) date1TextField.getValue());
+        Date date2 = ((Date) date2TextField.getValue());
+        if (date1 == null || date2 == null) {
+            JOptionPane.showMessageDialog(this, "Formato de fecha incorrecto.");
+            return;
+        }
+
+        date1TextField.setValue(null);
+        date2TextField.setValue(null);
+        date1TextField.setText("");
+        date2TextField.setText("");
+
         Double totalSalesSum = 0d;
-
-        String stateFilter;
-        String typeFilter;
-
-        if (this.comboBoxStates.getSelectedIndex() == -1 || ((String) this.comboBoxStates.getSelectedItem()).equals("NINGUNO")) {
-            stateFilter = "%";
-        } else {
-            stateFilter = ((String) this.comboBoxStates.getSelectedItem());
-        }
-
-        if (this.comboBoxTypes.getSelectedIndex() == -1 || ((String) this.comboBoxTypes.getSelectedItem()).equals("NINGUNO")) {
-            typeFilter = "%";
-        } else {
-            typeFilter = ((String) this.comboBoxTypes.getSelectedItem());
-        }
-
-        ArrayList<Sale> sales = DatabaseConnection.getSaleDao().getAllSales(stateFilter, typeFilter);
-        Object[][] data = new Object[sales.size()][7];
+        ArrayList<Sale.SoldProduct> sales = DatabaseConnection.getSaleDao().getAllSoldProductsInDateRange(date1.getTime(), date2.getTime());
+        Object[][] data = new Object[sales.size()][5];
         if (sales != null && !sales.isEmpty()) {
             for (int i = 0; i < sales.size(); i++) {
-                User c = DatabaseConnection.getUserDao().getUserById(sales.get(i).getBuyerId());
-                data[i][0] = sales.get(i).getId();
-                data[i][1] = sales.get(i).getState();
-                data[i][2] = sales.get(i).getType();
-                data[i][3] = c.getId();
-                data[i][4] = c.getName() + " " + c.getLastName();
-                data[i][5] = ApplicationStarter.formatDate(new Date(sales.get(i).getSaleDate()));
-                data[i][6] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getTotal());
+                
+                Double totalSold = sales.get(i).getQuantity()*sales.get(i).getPrice();
+                
+                data[i][0] = sales.get(i).getProductId();
+                data[i][1] = sales.get(i).getProductName();
+                data[i][2] = sales.get(i).getQuantity();
+                data[i][3] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getPrice());
+                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(totalSold);
 
-                totalSalesSum += sales.get(i).getTotal();
+                totalSalesSum += totalSold;
+            }
+
+            totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalSalesSum));
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontraron resultados.");
+            totalSales.setText("");
+        }
+        tableModel.setDataVector(data, TABLE_MODEL_IDENTIFIERS);
+
+    }
+
+    public void showAllSoldProducts(MouseEvent e) {
+        Double totalSalesSum = 0d;
+
+        ArrayList<Sale.SoldProduct> sales = DatabaseConnection.getSaleDao().getAllSoldProducts();
+        Object[][] data = new Object[sales.size()][5];
+        if (sales != null && !sales.isEmpty()) {
+            for (int i = 0; i < sales.size(); i++) {
+                
+                Double totalSold = sales.get(i).getQuantity()*sales.get(i).getPrice();
+                
+                data[i][0] = sales.get(i).getProductId();
+                data[i][1] = sales.get(i).getProductName();
+                data[i][2] = sales.get(i).getQuantity();
+                data[i][3] = ApplicationStarter.CURRENCY_FORMAT.format(sales.get(i).getPrice());
+                data[i][4] = ApplicationStarter.CURRENCY_FORMAT.format(totalSold);
+
+                totalSalesSum += totalSold;
             }
 
             totalSales.setText(ApplicationStarter.CURRENCY_FORMAT.format(totalSalesSum));
@@ -285,7 +227,7 @@ public class SalesView extends JPanel {
         footer = new JPanel(new BorderLayout());
         footer.setBorder(eb);
 
-        idSearchLabel = new JLabel("Código de la venta: ");
+        idSearchLabel = new JLabel("Código producto: ");
         idTextField = new JFormattedTextField(0L);
         idTextField.setValue(null);
         idTextField.setPreferredSize(new Dimension(250, 30));
@@ -299,10 +241,6 @@ public class SalesView extends JPanel {
 
         buttonShowAllSales = new JButton("Mostrar todo");
 
-        this.filters = new JLabel("Filtros (Estado | Tipo): ");
-        this.comboBoxStates = new JComboBox(new String[]{"NINGUNO", SaleState.PAGADA.toString(), SaleState.NO_PAGADA.toString(), SaleState.SOLICITADA.toString()});
-        this.comboBoxTypes = new JComboBox(new String[]{"NINGUNO", SaleType.CONTADO.toString(), SaleType.CREDITO.toString()});
-
         searchPaneFlowLayout = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         searchPaneFlowLayoutGridLayout = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -312,36 +250,22 @@ public class SalesView extends JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        searchPaneFlowLayoutGridLayout.add(filters, gbc);
-        JPanel fp = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
-        fp.add(this.comboBoxStates);
-        fp.add(this.comboBoxTypes);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        searchPaneFlowLayoutGridLayout.add(fp, gbc);
-
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.gridx = 0;
-        gbc.gridy = 1;
         searchPaneFlowLayoutGridLayout.add(idSearchLabel, gbc);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         searchPaneFlowLayoutGridLayout.add(idTextField, gbc);
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 2;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         searchPaneFlowLayoutGridLayout.add(idSearchButton, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         searchPaneFlowLayoutGridLayout.add(dateSearchLabel, gbc);
         datesPane = new JPanel();
         BoxLayout bl = new BoxLayout(datesPane, BoxLayout.X_AXIS);
@@ -351,18 +275,18 @@ public class SalesView extends JPanel {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         searchPaneFlowLayoutGridLayout.add(datesPane, gbc);
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 2;
-        gbc.gridy = 2;
+        gbc.gridy = 1;
         searchPaneFlowLayoutGridLayout.add(dateSearchButton, gbc);
 
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 2;
         searchPaneFlowLayoutGridLayout.add(buttonShowAllSales, gbc);
 
         searchPaneFlowLayout.add(searchPaneFlowLayoutGridLayout);
@@ -371,11 +295,13 @@ public class SalesView extends JPanel {
         totalSales = new JLabel();
         totalSalesLabel = new JLabel("Total Ventas: ");
 
-        seeDetailsButton = new JButton("Ver detalles");
-
-        addNewSaleButton = new JButton("Nueva venta");
-
-        soldProductsButton = new JButton("Productos Vendidos");
+        goBackButton = new JButton("Atrás");
+        
+        goBackPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        
+        goBackPanel.add(goBackButton);
+        
+        searchPane.add(goBackPanel, BorderLayout.NORTH);
 
         footerBoxLayout = new JPanel();
         BoxLayout b = new BoxLayout(footerBoxLayout, BoxLayout.X_AXIS);
@@ -385,22 +311,8 @@ public class SalesView extends JPanel {
         footerFlowLayoutTotalSales.add(totalSalesLabel);
         footerFlowLayoutTotalSales.add(totalSales);
 
-        footerFlowLayoutDetails = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-        footerFlowLayoutDetails.add(seeDetailsButton);
-
-        footerFlowLayoutNewSale = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-        footerFlowLayoutNewSale.add(addNewSaleButton);
-
-        footerFlowLayoutSoldProductsButton = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-        footerFlowLayoutSoldProductsButton.add(soldProductsButton);
 
         footerBoxLayout.add(footerFlowLayoutTotalSales);
-        footerBoxLayout.add(footerFlowLayoutDetails);
-        footerBoxLayout.add(footerFlowLayoutNewSale);
-        footerBoxLayout.add(footerFlowLayoutSoldProductsButton);
 
         footer.add(footerBoxLayout);
 
