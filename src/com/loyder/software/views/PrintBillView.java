@@ -85,7 +85,7 @@ public class PrintBillView extends javax.swing.JPanel {
         jButton2 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         bill = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        billPrint = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -145,12 +145,12 @@ public class PrintBillView extends javax.swing.JPanel {
 
         bill.setBackground(new java.awt.Color(255, 255, 255));
         java.awt.GridBagLayout jPanel5Layout = new java.awt.GridBagLayout();
-        jPanel5Layout.columnWidths = new int[] {700};
+        jPanel5Layout.columnWidths = new int[] {400};
         jPanel5Layout.rowHeights = new int[] {600};
         bill.setLayout(jPanel5Layout);
 
-        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel6.setLayout(new java.awt.BorderLayout(10, 10));
+        billPrint.setBackground(new java.awt.Color(255, 255, 255));
+        billPrint.setLayout(new java.awt.BorderLayout(10, 10));
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -204,7 +204,7 @@ public class PrintBillView extends javax.swing.JPanel {
 
         jPanel7.add(jPanel8);
 
-        jPanel6.add(jPanel7, java.awt.BorderLayout.NORTH);
+        billPrint.add(jPanel7, java.awt.BorderLayout.NORTH);
 
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setForeground(new java.awt.Color(0, 0, 0));
@@ -260,7 +260,7 @@ public class PrintBillView extends javax.swing.JPanel {
 
         jPanel10.setBackground(new java.awt.Color(255, 255, 255));
         jPanel10.setForeground(new java.awt.Color(0, 0, 0));
-        jPanel10.setLayout(new java.awt.GridLayout());
+        jPanel10.setLayout(new java.awt.GridLayout(1, 0));
 
         jPanel11.setBackground(new java.awt.Color(255, 255, 255));
         jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Datos del Cliente", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 1, 12), new java.awt.Color(0, 0, 0))); // NOI18N
@@ -332,12 +332,12 @@ public class PrintBillView extends javax.swing.JPanel {
 
         jPanel9.add(jPanel10, java.awt.BorderLayout.PAGE_START);
 
-        jPanel6.add(jPanel9, java.awt.BorderLayout.CENTER);
+        billPrint.add(jPanel9, java.awt.BorderLayout.CENTER);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        bill.add(jPanel6, gridBagConstraints);
+        bill.add(billPrint, gridBagConstraints);
 
         jPanel2.add(bill);
 
@@ -353,7 +353,7 @@ public class PrintBillView extends javax.swing.JPanel {
         // TODO add your handling code here:
         PrinterJob pj = PrinterJob.getPrinterJob();
         PageFormat pf = pj.defaultPage();
-        ComponentPrintable cp = new ComponentPrintable(this.bill);
+        ComponentPrintable cp = new ComponentPrintable(this.billPrint);
         pj.setPrintable(cp, pf);
         if (pj.printDialog()) {
             try {
@@ -367,6 +367,7 @@ public class PrintBillView extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bill;
+    private javax.swing.JPanel billPrint;
     private javax.swing.JLabel customerId;
     private javax.swing.JLabel customerName;
     private javax.swing.JTable detailsTable;
@@ -393,7 +394,6 @@ public class PrintBillView extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;

@@ -78,7 +78,7 @@
             </Property>
           </Properties>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jPanel6">
+            <Container class="javax.swing.JPanel" name="billPrint">
               <Properties>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -540,7 +540,7 @@
                 <CodeExpression id="2">
                   <ExpressionOrigin>
                     <Value type="[I" editor="org.netbeans.modules.form.layoutsupport.delegates.GridBagLayoutSupport$IntArrayPropertyEditor">
-                      <PropertyValue value="[700]"/>
+                      <PropertyValue value="[400]"/>
                     </Value>
                   </ExpressionOrigin>
                 </CodeExpression>
@@ -624,11 +624,11 @@
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component, java.lang.Object"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="8_jPanel6">
-                  <CodeVariable name="jPanel6" type="8194" declaredType="javax.swing.JPanel"/>
+                <CodeExpression id="8_billPrint">
+                  <CodeVariable name="billPrint" type="8194" declaredType="javax.swing.JPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
-                      <ComponentRef name="jPanel6"/>
+                      <ComponentRef name="billPrint"/>
                     </ExpressionProvider>
                   </ExpressionOrigin>
                 </CodeExpression>
