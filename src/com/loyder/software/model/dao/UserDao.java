@@ -14,12 +14,14 @@ import java.util.ArrayList;
  */
 public interface UserDao {
     
+    public boolean setUserAdder(Long id, Long newAdderId);
     public boolean removeUserById(Long id);
     public boolean addUser(User user);
     public boolean updateUser(User user);
     public User getUserById(Long userId);
     public User getUserByUserId(Long userId);
     public ArrayList<User> getUsersByName(String name);
+    public ArrayList<User> getUsersByParentId(Long parentId);
     public ArrayList<User> getAllUsers();
     public User getUserByIdAndCategoryId(Long userId, Long categoryId);
     public User getUserByUserIdAndCategoryId(Long userId, Long categoryId);

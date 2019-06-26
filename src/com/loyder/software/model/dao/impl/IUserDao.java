@@ -28,6 +28,7 @@ public class IUserDao implements UserDao {
     
     private static final String SQL_ADD_USER = "INSERT INTO "+Table.USERS+" ("+UsersTableField.user_id+","+UsersTableField.name+","+UsersTableField.last_name+","+UsersTableField.address+","+UsersTableField.tel+","+UsersTableField.cel+","+UsersTableField.adder_id+","+UsersTableField.entrance_date+","+UsersTableField.category_id+") VALUES(?,?,?,?,?,?,?,?,?)";
     private static final String SQL_GET_USER_BY_ID = "SELECT rowid,* FROM "+Table.USERS+" WHERE "+UsersTableField.rowid+"=?";
+    private static final String SQL_GET_USERS_BY_PARENT_ID = "SELECT rowid,* FROM "+Table.USERS+" WHERE "+UsersTableField.adder_id+"=?";
     private static final String SQL_GET_USER_BY_USER_ID = "SELECT rowid,* FROM "+Table.USERS+" WHERE "+UsersTableField.user_id+"=?";
     private static final String SQL_GET_ALL_USERS = "SELECT rowid,* FROM "+Table.USERS;
     private static final String SQL_GET_USERS_BY_NAME = "SELECT rowid,* FROM "+Table.USERS+" WHERE "+UsersTableField.name+" LIKE ? OR "+UsersTableField.last_name+" LIKE ?";
@@ -149,7 +150,8 @@ public class IUserDao implements UserDao {
         return null;
     }
     
-    private boolean setUserAdder(Long id, Long newAdderId){
+    @Override
+    public boolean setUserAdder(Long id, Long newAdderId){
         Connection conn = DatabaseConfig.getConnection();
         if(conn == null){
             JOptionPane.showMessageDialog(null, IUserDao.class.getName()+"::setUserAdder(): No se pudo establecer conexión con la base de datos.");
@@ -430,6 +432,28 @@ public class IUserDao implements UserDao {
             JOptionPane.showMessageDialog(null, IUserDao.class.getName()+"::updateUser(): "+ex.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public ArrayList<User> getUsersByParentId(Long parentId) {
+        Connection conn = DatabaseConfig.getConnection();
+        if(conn == null){
+            JOptionPane.showMessageDialog(null, IUserDao.class.getName()+"::getUsersByParentId(): No se pudo establecer conexión con la base de datos.");
+            return null;
+        }
+        try(PreparedStatement ps = conn.prepareStatement(SQL_GET_USERS_BY_PARENT_ID)){
+            ps.setLong(1, parentId);
+            ResultSet rs = ps.executeQuery();
+            ArrayList<User> users = new ArrayList<>();
+            while(rs.next()){
+                User u = new User(rs.getLong(UsersTableField.rowid.toString()), rs.getLong(UsersTableField.user_id.toString()), rs.getString(UsersTableField.name.toString()), rs.getString(UsersTableField.last_name.toString()), rs.getString(UsersTableField.address.toString()), rs.getString(UsersTableField.tel.toString()), rs.getString(UsersTableField.cel.toString()), rs.getLong(UsersTableField.adder_id.toString()), rs.getLong(UsersTableField.entrance_date.toString()), rs.getLong(UsersTableField.category_id.toString()));
+                users.add(u);
+            }
+            return users;
+        }catch(SQLException ex){
+            JOptionPane.showMessageDialog(null, IUserDao.class.getName()+"::getUsersByParentId(): "+ex.getMessage());
+        }
+        return null;
     }
 
 

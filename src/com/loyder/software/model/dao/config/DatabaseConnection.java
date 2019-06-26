@@ -8,6 +8,7 @@ package com.loyder.software.model.dao.config;
 import com.loyder.software.model.dao.AdminDao;
 import com.loyder.software.model.dao.BonusDao;
 import com.loyder.software.model.dao.CategoryDao;
+import com.loyder.software.model.dao.DeletedUserLogDao;
 import com.loyder.software.model.dao.IncomeDao;
 import com.loyder.software.model.dao.PercentageDao;
 import com.loyder.software.model.dao.ProductDao;
@@ -16,6 +17,7 @@ import com.loyder.software.model.dao.UserDao;
 import com.loyder.software.model.dao.impl.IAdminDao;
 import com.loyder.software.model.dao.impl.IBonusDao;
 import com.loyder.software.model.dao.impl.ICategoryDao;
+import com.loyder.software.model.dao.impl.IDeletedUserLogDao;
 import com.loyder.software.model.dao.impl.IIncomeDao;
 import com.loyder.software.model.dao.impl.IPercentageDao;
 import com.loyder.software.model.dao.impl.IProductDao;
@@ -53,5 +55,8 @@ public class DatabaseConnection {
     }
     public static CategoryDao getCategoryDao(){
         return ICategoryDao.getCategoryDao();
+    }
+    public static DeletedUserLogDao getDeletedUserLogDao(){
+        return IDeletedUserLogDao.getDeletedUserLogDao();
     }
 }

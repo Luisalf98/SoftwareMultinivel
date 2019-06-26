@@ -23,6 +23,7 @@ public class DatabaseConfig {
 
     public enum Table {
         USERS,
+        DELETED_USER_LOG,
         USERS_CATEGORIES,
         LEVELS_PERCENTAGES,
         PRODUCTS,
@@ -112,6 +113,13 @@ public class DatabaseConfig {
         entrance_date,
         category_id;
     }
+    
+    public enum DeletedUserLogTableField{
+        rowid,
+        user_id,
+        child_id,
+        parent_id;
+    }
 
     public enum BonusesTableField {
         rowid,
@@ -132,6 +140,13 @@ public class DatabaseConfig {
             + " " + AdminsTableField.tel + " TEXT, "
             + " " + AdminsTableField.cel + " TEXT "
             + ");";
+    
+    private static final String SQL_CREATE_DELETED_USER_LOG_TABLE = "CREATE TABLE IF NOT EXISTS " + Table.DELETED_USER_LOG + "("
+            + " " + DeletedUserLogTableField.user_id + " INTEGER NOT NULL, "
+            + " " + DeletedUserLogTableField.child_id + " INTEGER NOT NULL UNIQUE, "
+            + " " + DeletedUserLogTableField.parent_id + " INTEGER NOT NULL "
+            + ");";
+    
     private static final String SQL_CREATE_USERS_CATEGORIES_TABLE = "CREATE TABLE IF NOT EXISTS " + Table.USERS_CATEGORIES + "( "
             + UsersCategoriesTableField.name + " TEXT NOT NULL UNIQUE"
             + ");";
@@ -201,6 +216,24 @@ public class DatabaseConfig {
             }
         } else {
             JOptionPane.showMessageDialog(null, DatabaseConfig.class.getName()+"::createUsersTable(): No se pudo establecer conexión con la base de datos.");
+            return false;
+        }
+        
+    }
+    
+    private static boolean createDeletedUserLogTable() {
+        Connection con = getConnection();
+        if (con != null) {
+            try {
+                PreparedStatement ps = con.prepareStatement(SQL_CREATE_DELETED_USER_LOG_TABLE);
+                ps.execute();
+                return true;
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, DatabaseConfig.class.getName()+"::createDeletedUserLogTable(): " + ex.getMessage());
+                return false;
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, DatabaseConfig.class.getName()+"::createDeletedUserLogTable(): No se pudo establecer conexión con la base de datos.");
             return false;
         }
         
@@ -359,7 +392,8 @@ public class DatabaseConfig {
         createSalesTable() &&
         createUsersTable() &&
         createUsersCategoriesTable() &&
-        createAdminsTable();
+        createAdminsTable() &&
+        createDeletedUserLogTable();
     }
 
     public static boolean initDatabase() {

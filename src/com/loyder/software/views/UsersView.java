@@ -8,6 +8,7 @@ package com.loyder.software.views;
 import com.loyder.software.main.ApplicationStarter;
 import com.loyder.software.model.dao.config.DatabaseConnection;
 import com.loyder.software.model.entities.Category;
+import com.loyder.software.model.entities.DeletedUserLogRegister;
 import com.loyder.software.model.entities.User;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -51,7 +52,9 @@ public class UsersView extends JPanel {
     private JPanel searchPaneFlowLayoutGridLayout;
     private JPanel panelHeaderLeft;
     private JPanel drawTreePane;
+    private JPanel panelAddDeleteUser;
     private JPanel panelDeleteUserFromNetwork;
+    private JPanel panelRestoreUserInNetwork;
     private JPanel footer;
     private JPanel footerBoxLayout;
     private JLabel idSearchLabel;
@@ -62,6 +65,7 @@ public class UsersView extends JPanel {
     private DefaultComboBoxModel comboBoxCategoryFilterModel;
     private JButton drawTreeButton;
     private JButton buttonDeleteUserFromNetwork;
+    private JButton buttonRestoreUserInNetwork;
     private JButton userIdSearchButton;
     private JButton nameSearchButton;
     private JButton idSearchButton;
@@ -84,10 +88,18 @@ public class UsersView extends JPanel {
     private UserRegisterView registerRecommenderView;
     private UserPurchasesView userPurchasesView;
     private MultiLevelNetworkDrawer multiLevelNetworkDrawer;
+    
+    private ArrayList<DeletedUserLogRegister> deletedUserLogRegisters;
 
     public UsersView(JPanel panelParent1) throws ParseException {
         initComponents();
         this.panelParent = panelParent1;
+        
+        deletedUserLogRegisters = DatabaseConnection.getDeletedUserLogDao().getDeletedUserLogRegisters();
+        
+        if(deletedUserLogRegisters==null || deletedUserLogRegisters.isEmpty()){
+            buttonRestoreUserInNetwork.setEnabled(false);
+        }
 
         userIdSearchButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -117,6 +129,15 @@ public class UsersView extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 deleteUserFromNetwork(e);
+            }
+        });
+        buttonRestoreUserInNetwork.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(!buttonRestoreUserInNetwork.isEnabled()){
+                    return;
+                }
+                restoreUserInNetwork(e);
             }
         });
 
@@ -203,10 +224,60 @@ public class UsersView extends JPanel {
             return;
         }
         Long userId = (Long)table.getValueAt(table.getSelectedRow(), 0);
-        if(DatabaseConnection.getUserDao().removeUserById(userId)){
-            JOptionPane.showMessageDialog(null, "Operación exitosa!");
+        User user = DatabaseConnection.getUserDao().getUserById(userId);
+        ArrayList<User> childs = DatabaseConnection.getUserDao().getUsersByParentId(userId);
+        if(JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(null, 
+                "¿Está seguro de querer eliminar al usuario "+user.getName()+" "+user.getLastName()+
+                        " con Número de identificación "+ user.getUserId()+" de la red?", 
+                "Confirmación de Eliminación", JOptionPane.OK_CANCEL_OPTION)){
+            if(DatabaseConnection.getUserDao().removeUserById(userId)){
+                if(childs==null || childs.isEmpty()){
+                    DatabaseConnection.getDeletedUserLogDao().addRegister(new DeletedUserLogRegister(
+                                null, user.getId(), -1L, user.getAdderId()
+                        ));
+                }else{
+                    for(User child : childs){
+                        DatabaseConnection.getDeletedUserLogDao().addRegister(new DeletedUserLogRegister(
+                                null, user.getId(), child.getId(), user.getAdderId()
+                        ));
+                    }
+                }
+                JOptionPane.showMessageDialog(null, "Operación exitosa!");
+                deletedUserLogRegisters = DatabaseConnection.getDeletedUserLogDao().getDeletedUserLogRegisters();
+                buttonRestoreUserInNetwork.setEnabled(true);
+            }else{
+                JOptionPane.showMessageDialog(null, "Error!");
+            }
         }else{
-            JOptionPane.showMessageDialog(null, "Error!");
+            JOptionPane.showMessageDialog(null, "Operación Cancelada!");
+        }
+    }
+    
+    public void restoreUserInNetwork(MouseEvent e){
+        if(deletedUserLogRegisters == null || deletedUserLogRegisters.isEmpty()){
+            JOptionPane.showMessageDialog(null, "No hay usuario por restablecer!");
+            return;
+        }
+        
+        User u = DatabaseConnection.getUserDao().getUserById(deletedUserLogRegisters.get(0).getUserId());
+        if(JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(null, 
+                "¿Está seguro de querer restablecer al usuario "+u.getName()+" "+u.getLastName()+
+                        " con Número de identificación "+ u.getUserId()+" en la red?", 
+                "Confirmación de Restablecimiento de Usuario", JOptionPane.OK_CANCEL_OPTION)){
+            
+            DatabaseConnection.getUserDao().setUserAdder(deletedUserLogRegisters.get(0).getUserId(), deletedUserLogRegisters.get(0).getParentId());
+            if(deletedUserLogRegisters.get(0).getChildId() != -1L){
+                for(int i=0; i<deletedUserLogRegisters.size(); i++){
+                    DatabaseConnection.getUserDao().setUserAdder(deletedUserLogRegisters.get(i).getChildId(), deletedUserLogRegisters.get(i).getUserId());
+                }
+            }
+            
+            JOptionPane.showMessageDialog(null, "Operación exitosa!");
+            buttonRestoreUserInNetwork.setEnabled(false);
+            DatabaseConnection.getDeletedUserLogDao().deleteAllRegisters();
+            
+        }else{
+            JOptionPane.showMessageDialog(null, "Operación Cancelada!");
         }
     }
 
@@ -416,6 +487,12 @@ public class UsersView extends JPanel {
         buttonDeleteUserFromNetwork = new JButton("Eliminar Usuario de la Red");
         
         panelDeleteUserFromNetwork.add(buttonDeleteUserFromNetwork);
+        
+        panelRestoreUserInNetwork = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        
+        buttonRestoreUserInNetwork = new JButton("Restablecer Usuario Eliminado");
+        
+        panelRestoreUserInNetwork.add(buttonRestoreUserInNetwork);
 
         drawTreePane = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
@@ -423,8 +500,12 @@ public class UsersView extends JPanel {
 
         drawTreePane.add(drawTreeButton);
         
+        panelAddDeleteUser = new JPanel(new GridLayout(1,2));
+        panelAddDeleteUser.add(panelDeleteUserFromNetwork);
+        panelAddDeleteUser.add(panelRestoreUserInNetwork);
+        
         panelHeaderLeft.add(drawTreePane, BorderLayout.NORTH);
-        panelHeaderLeft.add(panelDeleteUserFromNetwork, BorderLayout.SOUTH);
+        panelHeaderLeft.add(panelAddDeleteUser, BorderLayout.SOUTH);
 
         searchPaneFlowLayout.add(searchPaneFlowLayoutGridLayout);
         searchPane.add(searchPaneFlowLayout, BorderLayout.CENTER);
